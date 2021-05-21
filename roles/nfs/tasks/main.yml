@@ -1,21 +1,24 @@
-- name: Update all packages to the latest version
-  apt:
-    upgrade: dist
-
+---
 - name: install required packages
   apt:
     state: present
     pkg: "{{ required_packages}}"
+    autoclean: true
+    autoremove: true
+    update_cache: true
   when: (required_packages is defined ) and (required_packages|length > 0)
 
 - name: install extra packages
   apt:
     state: present
+    autoclean: true
+    autoremove: true
+    update_cache: true
     pkg: "{{ extra_packages }}"
   when: (extra_packages is defined ) and (extra_packages|length > 0)
 
 # ------------ nfs server ------------
-- name: "nfs: install extra packages"
+- name: "nfsserver: install nfs service"
   apt:
     state: present
     name: nfs-kernel-server
@@ -34,7 +37,7 @@
 
 - name: "nfsserver: get UUID_value from partition {{ cluster_name }}"
   # Read device information (always use unit when probing)
-  shell: "blkid | grep {{ parition_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+  shell: "blkid | grep {{ cluster_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
   register: UUID_cluster_value
   when: ansible_hostname == nfsserver_name
   tags: nfsserver
@@ -47,11 +50,13 @@
   tags: nfsserver
 
 - name: "nfs: Print all available facts"
-  ansible.builtin.debug:
+  debug:
     #var: ansible_facts
-    var:
-      - UUID_cluster_value.stdout
-      - UUID_master_value.stdout
+    var: "{{ item }}"
+  with_items:
+    - UUID_cluster_value.stdout
+    - UUID_master_value.stdout
+  when: ansible_hostname == nfsserver_name
   tags: nfsserver
 
 - name: "nfsserver: Mount up device by UUID"
@@ -81,7 +86,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  notify: reload nfsserver
+
   when: ansible_hostname == nfsserver_name
   tags: nfsserver
 
@@ -93,7 +98,9 @@
   loop: "{{ nfsserver_services }}"
   when: nfs_enable and (nfsserver_services|length > 0) and (ansible_hostname == nfsserver_name)
   tags: [ nfsserver ]
-  notify: export nfs filesystem for client
+  notify:
+    - reload nfsserver
+    - export nfs filesystem for client
 
 - name: "nfsserver: Stop and disable nfsserver services"
   systemd:
@@ -118,7 +125,7 @@
 
 - name: "nfsclient: configure clients mount"
   ansible.posix.mount:
-    src: "{{ nfsserver_name }}:{{ mount_point_usb }}"
+    src: "{{ nfsserver_name }}:{{ mount_point_usb_cluster }}"
     path: "{{ mount_point_nfs }}"
     fstype: nfs
     opts: "{{ nfsclient_options }}"

@@ -27,6 +27,13 @@
   #    - name: test
   #      import_tasks: ~/.ansible/roles/mikolak-net.raspi_config/tasks/raspi-config-1-user-password.yml
 
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+    autoclean: true
+    autoremove: true
+    update_cache: true
+
 - name: config raspi
   import_role:
     name: mikolak-net.raspi_config

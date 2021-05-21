@@ -4,4 +4,4 @@
   systemd: name="{{ nfsserver_services }}" state="reloaded"
 
 - name: export nfs filesystem for client
-  command: "exportfs -sfav"
+  command: "exportfs -rsfav"

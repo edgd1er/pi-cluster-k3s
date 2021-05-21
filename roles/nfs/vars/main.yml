@@ -9,8 +9,8 @@ nfsserver_services:
 #mount point for nfs server
 mount_point_usb_master: "/media/master_data"
 mount_point_usb_cluster: "/media/cluster_data"
-usb_device: "/dev/sda5"
-parition_name: "CLUSTER_DATA"
+#partition's names
+cluster_name: "CLUSTER_DATA"
 master_name: "MASTER_DATA"
 #mount point for nfs client
 mount_point_nfs: "/media/cluster_data"
