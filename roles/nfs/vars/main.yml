@@ -7,8 +7,11 @@ nfsserver_exports: [ "/media/cluster_data  192.168.53.0/24(rw,sync,no_root_squas
 nfsserver_services:
   - nfs-server.service
 #mount point for nfs server
-mount_point_usb: "/media/cluster_data"
+mount_point_usb_master: "/media/master_data"
+mount_point_usb_cluster: "/media/cluster_data"
 usb_device: "/dev/sda5"
+parition_name: "CLUSTER_DATA"
+master_name: "MASTER_DATA"
 #mount point for nfs client
 mount_point_nfs: "/media/cluster_data"
 # host.myserver.com:/home /mnt/home nfs rw,hard,intr,rsize=8192,wsize=8192,timeo=14 0 0

@@ -26,29 +26,48 @@
   ansible.builtin.file:
     path: "{{ mount_point_usb }}"
     state: directory
-    mode: 777
+    mode: 0777
     owner: root
     group: root
   when: ansible_hostname == nfsserver_name
   tags: nfsserver
 
-- name: "nfsserver: get {{ usb_device }} UUID_value"
+- name: "nfsserver: get UUID_value from partition {{ cluster_name }}"
   # Read device information (always use unit when probing)
-  shell: "blkid | grep CLUSTER_DATA |grep -Po '(?<= UUID=\")([^\"]+)'"
-  register: UUID_value
+  shell: "blkid | grep {{ parition_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+  register: UUID_cluster_value
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfsserver: get UUID_value from partition {{ master_name }}"
+  # Read device information (always use unit when probing)
+  shell: "blkid | grep {{ master_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+  register: UUID_master_value
   when: ansible_hostname == nfsserver_name
   tags: nfsserver
 
 - name: "nfs: Print all available facts"
   ansible.builtin.debug:
     #var: ansible_facts
-    var: UUID_value
+    var:
+      - UUID_cluster_value.stdout
+      - UUID_master_value.stdout
   tags: nfsserver
 
 - name: "nfsserver: Mount up device by UUID"
   ansible.posix.mount:
-    src: UUID={{ UUID_value.stdout }}
-    path: "{{ mount_point_usb }}"
+    src: UUID={{ UUID_cluster_value.stdout }}
+    path: "{{ mount_point_usb_cluster }}"
+    fstype: ext4
+    opts: defaults,noatime
+    state: mounted
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfsserver: Mount up device by UUID"
+  ansible.posix.mount:
+    src: UUID={{ UUID_master_value.stdout }}
+    path: "{{ mount_point_usb_master }}"
     fstype: ext4
     opts: defaults,noatime
     state: mounted
@@ -91,7 +110,7 @@
   ansible.builtin.file:
     path: "{{ mount_point_nfs }}"
     state: directory
-    mode: 777
+    mode: 0777
     owner: root
     group: root
   when: ansible_hostname != nfsserver_name

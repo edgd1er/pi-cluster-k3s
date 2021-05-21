@@ -111,7 +111,7 @@
     msg: "swapfile size is: {{ swapon_size.stdout }}"
 
 - name: Disable default swap device
-  ansible.builtin.shell: "{{ item }}"
+  command: "{{ item }}"
   args:
     warn: false # set warn=false to prevent warning
   with_items:
@@ -122,7 +122,7 @@
   when: (raspi_config_advanced_swapfile == 0) and (swapon_size.stdout != '')
 
 - name: Enable default swap device
-  shell: "{{ item }}"
+  command: "{{ item }}"
   args:
     warn: false # set warn=false to prevent warning
   with_items:
