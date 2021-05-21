@@ -13,8 +13,9 @@
     upgrade: dist
   when: raspi_config_update_packages
 
-- name: 1-configure pi user
-  import_tasks: raspi-config-1-user-password.yml
+# done through user module in users role
+#- name: 1-configure pi user
+#  import_tasks: raspi-config-1-user-password.yml
 - name: 2-configure raspberry network
   import_tasks: raspi-config-2-network-options.yml
 - name: 3-configure raspi-config-3-boot-options

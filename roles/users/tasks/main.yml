@@ -13,6 +13,15 @@
     label: "{{ item.name }} - {{ item.groups }}"
   when: true
 
+- name: update password of existing users
+  user:
+    name: "{{ item.name }}"
+    update_password: always
+    password: "{{ item.password }}"
+  loop: "{{ existing_users }}"
+  loop_control:
+    label: "new password for {{ item.name }}"
+
 - name: Create new users
   ansible.builtin.user:
     name: "{{ item.name }}"
