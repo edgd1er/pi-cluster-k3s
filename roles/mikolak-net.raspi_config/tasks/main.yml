@@ -1,0 +1,64 @@
+---
+# tasks file for ansible-role-raspi-config
+
+- name: Assert remote is an RPi in expected state
+  import_tasks: asserts.yml
+
+- name: Get RPi version
+  import_tasks: get-info.yml
+
+- name: update all packages
+  apt:
+    update_cache: true
+    upgrade: dist
+  when: raspi_config_update_packages
+
+- name: 1-configure pi user
+  import_tasks: raspi-config-1-user-password.yml
+- name: 2-configure raspberry network
+  import_tasks: raspi-config-2-network-options.yml
+- name: 3-configure raspi-config-3-boot-options
+  import_tasks: raspi-config-3-boot-options.yml
+- name: 4-configure localisation
+  import_tasks: raspi-config-4-localisation-options.yml
+- name: 5-configure raspberry interfaces camera, i2c,spi, serial, oneWire, remote GPIO, vnc, ssh,
+  import_tasks: raspi-config-5-interfacing-options.yml
+- name: 6-configure raspberry overclock
+  import_tasks: raspi-config-6-overclock.yml
+- name: 7-configure raspberry options
+  import_tasks: raspi-config-7-advanced-options.yml
+
+#- name: Set up zram
+#  import_tasks: zram.yml
+#  notify:
+#    - reboot
+
+#- name: Set up log2ram
+#  import_tasks: log2ram.yml
+#  notify:
+#    - reboot
+
+# - include_tasks: setup_create_user.yml
+#   when: raspi_config_create_users is defined and ( raspi_config_create_users | length > 0 )
+#   loop: "{{ raspi_config_create_users }}"
+#   loop_control:
+#     loop_var: raspi_config_create_user
+
+#- import_tasks: setup_replace_user.yml
+#  when: raspi_config_replace_user['name'] != None
+#
+#- import_tasks: security_check.yml
+
+
+#- name: ensure mem split
+#  pi_boot_config:
+#    config_vals: "gpu_mem={{ raspi_config_memory_split_gpu }}"
+#  notify:
+#    - apply raspi-config
+#    - reboot
+
+
+#- name: Disable services
+#  import_tasks: disable-services.yml
+#  notify:
+#    - reboot

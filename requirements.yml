@@ -1,0 +1,12 @@
+collections: []
+  #- name: ansible.posix
+  #- name: ansible.posix.authorized_keys
+  #- name: ansible.posix.mount
+  #- src: ansible.posix
+
+roles:
+  #- src: mikolak-net.raspi_config
+  # from GitHub, overriding the name and specifying a specific tag
+  - name: mikolak-net.raspi_config
+    src: https://github.com/edgd1er/ansible-raspi-config
+    version: master

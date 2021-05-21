@@ -1,0 +1,43 @@
+---
+
+# "ansible_architecture": "armv6l",
+# "ansible_distribution": "Debian",
+# "ansible_distribution_release": "buster",
+# "ansible_distribution_version": "10",
+# "ansible_lsb": {
+#   "codename": "buster",
+#   "description": "Raspbian GNU/Linux 10 (buster)",
+#   "id": "Raspbian",
+#   "major_release": "10",
+#   "release": "10"
+# },
+# "ansible_machine": "armv6l",
+# "ansible_processor": [
+#     "0",
+#     "ARMv6-compatible processor rev 7 (v6l)"
+# ],
+
+- name: Assert an ARM processor
+  ansible.builtin.assert:
+    that:
+      ansible_architecture.find('v=' ~ 'arm') == -1
+
+- name: Assert distribution is Debian type
+  ansible.builtin.assert:
+    that:
+      ansible_distribution.find('v=' ~ 'Debian') == -1
+
+- name: Assert OS is Raspbian
+  ansible.builtin.assert:
+    that:
+      ansible_lsb.id.find('v=' ~ 'Raspbian') == -1
+
+- name: Check raspi-config
+  ansible.builtin.stat:
+    path: /usr/bin/raspi-config
+  register: stat_result
+
+- name: Assert raspi-config exists
+  ansible.builtin.assert:
+    that:
+      stat_result.stat.exists

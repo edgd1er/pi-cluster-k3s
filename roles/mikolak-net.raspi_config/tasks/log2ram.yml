@@ -1,0 +1,33 @@
+---
+
+# Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Print service facts
+  ansible.builtin.debug:
+    var: service_state.ansible_facts.services["log2ram.service"].state
+
+- name: Stop log2ram service if running
+  become: yes
+  ansible.builtin.service:
+    name: log2ram
+    state: stopped
+  when: service_state.ansible_facts.services["log2ram.service"] is defined
+
+- name: Clone the log2ram repository
+  ansible.builtin.git:
+    repo: 'https://github.com/azlux/log2ram.git'
+    dest: /tmp/log2ram
+
+- name: Install log2ram
+  become: yes
+  ansible.builtin.command: ./install.sh
+  args:
+    chdir: /tmp/log2ram
+
+- name: Cleanup installation files
+  ansible.builtin.file:
+    path: /tmp/log2ram
+    state: absent

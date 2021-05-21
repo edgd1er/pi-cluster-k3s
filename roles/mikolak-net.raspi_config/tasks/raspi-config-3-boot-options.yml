@@ -1,0 +1,63 @@
+---
+
+# 3 Boot Options
+
+# B1 Desktop / CLI
+- name: Get boot CLI
+  shell: "raspi-config nonint get_boot_cli"
+  register: boot_cli
+  changed_when: False
+
+- name: Print boot CLI
+  debug:
+    msg: "Boot CLI is: {{ boot_cli.stdout }}"
+
+- name: Get boot autologin
+  shell: "raspi-config nonint get_autologin"
+  register: auto_login
+  changed_when: False
+
+- name: Print boot autologin status
+  debug:
+    msg: "Boot autologin is: {{ auto_login.stdout }}"
+
+# B1 cli, B2 cli autologin, B3 desktop, B4 desktop autologin
+- name: Set Boot behaviour
+  shell: "raspi-config nonint do_boot_behaviour {{ raspi_config_boot_behaviour }}"
+
+# B2 Wait for Network at Boot
+- name: Get boot wait for network status
+  shell: "raspi-config nonint get_boot_wait"
+  register: boot_wait
+  changed_when: False
+
+- name: Print boot wait for network status
+  debug:
+    msg: "Boot wait is: {{ boot_wait.stdout }}"
+
+#- name: Set boot wait network status
+  #shell: "raspi-config nonint do_boot_wait {{ raspi_config_boot_wait }}"
+
+# B3 Splash Screen
+- name: Get splash status
+  shell: "raspi-config nonint get_boot_splash"
+  register: boot_splash
+  changed_when: False
+
+- name: Print boot splash status
+  debug:
+    msg: "Boot splash status is: {{ boot_splash.stdout }}, expected {{ raspi_config_boot_splash }}"
+
+- name: Set boot splash
+  shell: "raspi-config nonint do_boot_splash {{ raspi_config_boot_splash }}"
+  when: boot_splash.stdout != raspi_config_boot_splash
+  ignore_errors: true
+
+- name: ensure correct CPU parameters for Pi2
+  ensure_pi2_oc:
+  args:
+    cpu_types: "{{ raspi_config_pi_cpu }}"
+  when: raspi_config_ensure_optimal_cpu_params
+  notify:
+    - apply raspi-config
+    - reboot

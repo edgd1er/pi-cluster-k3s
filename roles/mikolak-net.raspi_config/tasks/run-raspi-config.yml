@@ -1,0 +1,22 @@
+---
+
+- name: Set user password configuration
+  import_tasks: raspi-config-1-user-password
+
+- name: Set network options configuration
+  import_tasks: raspi-config-2-network-options
+
+- name: Set boot options configuration
+  import_tasks: raspi-config-3-boot-options
+
+- name: Set localisation options configuration
+  import_tasks: raspi-config-4-localisation-options
+
+- name: Set interfacing options configuration
+  import_tasks: raspi-config-5-interfacing-options
+
+- name: Set overclock configuration
+  import_tasks: raspi-config-6-overclock
+
+- name: Set advanced options configuration
+  import_tasks: raspi-config-7-advanced-options

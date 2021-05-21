@@ -1,0 +1,30 @@
+---
+# handlers file for ansible-role-raspi-config
+
+- name: apply raspi-config
+  command: raspi-config --apply-os-config
+
+- name: reboot
+  shell: "sleep 1 && shutdown -r now +1"
+  async: 1
+  poll: 0
+  notify:
+    - wait for reboot
+
+- name: wait for reboot
+  wait_for_connection:
+    delay: "{{ raspi_config_reboot_min_time }}"
+    timeout: "{{ raspi_config_reboot_max_wait_time }}"
+
+- name: remove default user
+  when: "raspi_config_replace_user['name'] != raspi_config_auth_test_username"
+  user: name={{ raspi_config_auth_test_username }} state=absent force=yes
+  async: 0
+  poll: 0
+  ignore_errors: true
+
+- name: restart timezone dependent services
+  service:
+    name: "{{ item }}"
+    state: restarted
+  with_items: "{{ raspi_config_timezone_dependent_services }}"

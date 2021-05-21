@@ -1,0 +1,110 @@
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install required packages
+  apt:
+    state: present
+    pkg: "{{ required_packages}}"
+  when: (required_packages is defined ) and (required_packages|length > 0)
+
+- name: install extra packages
+  apt:
+    state: present
+    pkg: "{{ extra_packages }}"
+  when: (extra_packages is defined ) and (extra_packages|length > 0)
+
+# ------------ nfs server ------------
+- name: "nfs: install extra packages"
+  apt:
+    state: present
+    name: nfs-kernel-server
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfsserver: create dir for storage"
+  ansible.builtin.file:
+    path: "{{ mount_point_usb }}"
+    state: directory
+    mode: 777
+    owner: root
+    group: root
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfsserver: get {{ usb_device }} UUID_value"
+  # Read device information (always use unit when probing)
+  shell: "blkid | grep CLUSTER_DATA |grep -Po '(?<= UUID=\")([^\"]+)'"
+  register: UUID_value
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfs: Print all available facts"
+  ansible.builtin.debug:
+    #var: ansible_facts
+    var: UUID_value
+  tags: nfsserver
+
+- name: "nfsserver: Mount up device by UUID"
+  ansible.posix.mount:
+    src: UUID={{ UUID_value.stdout }}
+    path: "{{ mount_point_usb }}"
+    fstype: ext4
+    opts: defaults,noatime
+    state: mounted
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfsserver: Configure exports"
+  template:
+    src: exports.j2
+    dest: "/etc/exports"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: reload nfsserver
+  when: ansible_hostname == nfsserver_name
+  tags: nfsserver
+
+- name: "nfsserver: Enable and start nfsserver services"
+  systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: "{{ nfsserver_services }}"
+  when: nfs_enable and (nfsserver_services|length > 0) and (ansible_hostname == nfsserver_name)
+  tags: [ nfsserver ]
+  notify: export nfs filesystem for client
+
+- name: "nfsserver: Stop and disable nfsserver services"
+  systemd:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+  loop: "{{ nfs-serve_services }}"
+  when: (not nfs_enable|bool ) or ( nfsserver_services|length < 1 ) and (ansible_hostname != nfsserver_name)
+  tags: [ nfsserver ]
+
+# ------------ nfs clients ------------
+
+- name: "nfsclient: create mount point for nfs client"
+  ansible.builtin.file:
+    path: "{{ mount_point_nfs }}"
+    state: directory
+    mode: 777
+    owner: root
+    group: root
+  when: ansible_hostname != nfsserver_name
+  tags: nfsclient
+
+- name: "nfsclient: configure clients mount"
+  ansible.posix.mount:
+    src: "{{ nfsserver_name }}:{{ mount_point_usb }}"
+    path: "{{ mount_point_nfs }}"
+    fstype: nfs
+    opts: "{{ nfsclient_options }}"
+    state: mounted
+  when: ansible_hostname != nfsserver_name
+  tags: nfsclient
+
+#-----------------------------------------------------------

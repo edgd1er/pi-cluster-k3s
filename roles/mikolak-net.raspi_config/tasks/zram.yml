@@ -1,0 +1,37 @@
+---
+
+# Based on
+# https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Print service facts
+  ansible.builtin.debug:
+    var: service_state.ansible_facts.services["zram-swap-config.service"].state
+
+- name: Stop zram-swap-config service if running
+  become: yes
+  ansible.builtin.service:
+    name: zram-swap-config
+    state: stopped
+  when: service_state.ansible_facts.services["zram-swap-config.service"] is defined
+
+- name: Clone zram-config project
+  ansible.builtin.git:
+    repo: 'https://github.com/StuartIanNaylor/zram-swap-config.git'
+    dest: /tmp/zram-swap-config
+
+- name: Run the install script
+  become: true
+  ansible.builtin.command: ./install.sh
+  args:
+    chdir: /tmp/zram-swap-config
+
+- name: Cleanup installation files
+  ansible.builtin.file:
+    path: /tmp/zram-swap-config
+    state: absent
+
+- name: Disable default swap device
+  ansible.builtin.command: "dphys-swapfile swapoff && dphys-swapfile uninstall && update-rc.d dphys-swapfile disable"

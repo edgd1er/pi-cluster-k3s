@@ -1,0 +1,158 @@
+---
+
+# 5 Interfacing Options
+
+# P1 CAMERA
+- name: Get camera status
+  shell: "raspi-config nonint get_camera"
+  register: camera_status
+  changed_when: False
+
+- name: Print camera status
+  debug:
+    msg: "Camera status is: {{ camera_status.stdout }}"
+
+- name: Enable Camera
+  shell: "raspi-config nonint do_camera 0"
+  when: (raspi_config_interface_enable_camera) and (camera_status.stdout != '0')
+
+- name: Disable Camera
+  shell: "raspi-config nonint do_camera 1"
+  when: (not raspi_config_interface_enable_camera) and (camera_status.stdout != '1')
+
+# P2 SSH
+- name: Check if SSH is enabled or not
+  shell: "raspi-config nonint get_ssh"
+  register: ssh_status
+  changed_when: False
+
+- name: Print SSH status
+  debug:
+    msg: "SSH status is: {{ ssh_status.stdout }}"
+
+- name: Enable SSH
+  shell: "raspi-config nonint do_ssh 0"
+  when: (raspi_config_interface_enable_ssh) and (ssh_status.stdout != '0')
+
+- name: Disable SSH
+  shell: "raspi-config nonint do_ssh 1"
+  when: (not raspi_config_interface_enable_ssh) and (ssh_status.stdout != '1')
+
+# P3 VNC
+- name: Get VNC status
+  shell: "raspi-config nonint get_vnc"
+  register: vnc_status
+  changed_when: False
+
+- name: Print VNC status
+  debug:
+    msg: "VNC status is: {{ vnc_status.stdout }}"
+
+- name: Enable VNC
+  shell: "raspi-config nonint do_vnc 0"
+  when: raspi_config_interface_enable_vnc and (vnc_status.stdout != '0')
+  ignore_errors: yes #to avoid error when var is not set
+
+- name: Disable VNC
+  shell: "raspi-config nonint do_vnc 1"
+  when: (not raspi_config_interface_enable_vnc) and (vnc_status.stdout != '1')
+  ignore_errors: yes #to avoid error when var is not set
+
+# P4 SPI
+- name: Get SPI status
+  shell: "raspi-config nonint get_spi"
+  register: spi_status
+  changed_when: False
+
+- name: Print SPI status
+  debug:
+    msg: "SPI status is: {{ spi_status.stdout }}"
+
+- name: Enable SPI
+  shell: "raspi-config nonint do_spi 0"
+  when: (raspi_config_interface_enable_spi) and (spi_status.stdout != '0')
+
+- name: Disable SPI
+  shell: "raspi-config nonint do_spi 1"
+  when: (not raspi_config_interface_enable_spi) and (spi_status.stdout != '1')
+
+# P5 I2C
+- name: Get I2C status
+  shell: "raspi-config nonint get_i2c"
+  register: i2c_status
+  changed_when: False
+
+- name: Print I2C status
+  debug:
+    msg: "I2C status is: {{ i2c_status.stdout }}"
+
+- name: Enable I2C
+  shell: "raspi-config nonint do_i2c 0"
+  when: raspi_config_interface_enable_i2c and (i2c_status.stdout != '0')
+
+- name: Disable I2C
+  shell: "raspi-config nonint do_i2c 1"
+  when: (not raspi_config_interface_enable_i2c) and (i2c_status.stdout != '1')
+
+# P6 Serial
+- name: Get serial status
+  shell: "raspi-config nonint get_serial"
+  register: serial_status
+  changed_when: False
+
+- name: Get serialHW status
+  shell: "raspi-config nonint get_serial_hw"
+  register: serialhw_status
+  changed_when: False
+
+- name: Print serial status
+  debug:
+    msg: "Serial status is: {{ serial_status.stdout }}"
+
+- name: Print serialHW status
+  debug:
+    msg: "SerialHW status is: {{ serialhw_status.stdout }}"
+
+- name: Enable serial
+  shell: "raspi-config nonint do_serial 0"
+  when: (raspi_config_interface_enable_serial) and (serial_status.stdout != '0')
+
+- name: Disable serial
+  shell: "raspi-config nonint do_serial 1"
+  when: (not raspi_config_interface_enable_serial) and (serial_status.stdout != '1')
+
+# P7 1-Wire
+- name: Get Onewire status
+  shell: "raspi-config nonint get_onewire"
+  register: onewire_status
+  changed_when: False
+
+- name: Print Onewire status
+  debug:
+    msg: "Onewire status is: {{ onewire_status.stdout }}"
+
+- name: Enable OneWire
+  shell: "raspi-config nonint do_onewire 0"
+  when: (raspi_config_interface_enable_onewire) and (onewire_status.stdout != '0')
+
+- name: Disable OneWire
+  shell: "raspi-config nonint do_onewire 1"
+  when: (not raspi_config_interface_enable_onewire) and (onewire_status.stdout != '1')
+
+# P8 Remote GPIO
+- name: Get rGPIO status
+  shell: "raspi-config nonint get_rgpio"
+  register: rgpio_status
+  changed_when: False
+
+- name: Print rGPIO status
+  debug:
+    msg: "rGPIO status is: {{ rgpio_status.stdout }}"
+
+- name: Enable Remote GPIO
+  shell: "raspi-config nonint do_rgpio 0"
+  when: (raspi_config_interface_enable_rgpio) and (rgpio_status.stdout != '0')
+
+- name: Disable Remote GPIO
+  shell: "raspi-config nonint do_rgpio 1"
+  when: (not raspi_config_interface_enable_rgpio) and (rgpio_status.stdout != '1')

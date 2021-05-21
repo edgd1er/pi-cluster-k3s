@@ -1,0 +1,39 @@
+---
+
+# 2 Network Options
+
+# N1 Hostname
+- name: Get hostname
+  command: "raspi-config nonint get_hostname"
+  register: pi_hostname
+  changed_when: False
+
+- name: Print current hostname
+  debug:
+    msg: "Current hostname: {{ pi_hostname.stdout }}, should be {{ inventory_hostname }}"
+
+- name: Change hostname
+  command: "raspi-config nonint do_hostname {{ inventory_hostname }}"
+  when: pi_hostname.stdout != inventory_hostname
+
+# N2 Wi-fi
+#- name: Set WiFi credentials
+  #shell: "raspi-config nonint do_wifi_ssid_passphrase {{ SSID }} {{ PASSPHRASE }}"
+
+# N3 Network interface names
+- name: Get network names status
+  command: "raspi-config nonint get_net_names"
+  register: pi_netnames
+  changed_when: False
+
+- name: Print current network names status
+  debug:
+    msg: "Current network names status: {{ pi_netnames.stdout }}"
+
+- name: Enable network names
+  command: "raspi-config nonint do_net_names 0"
+  when: raspi_config_network_netnames and (pi_netnames.stdout != '0')
+
+- name: Disable network names
+  command: "raspi-config nonint do_net_names 1"
+  when: (not raspi_config_network_netnames ) and (pi_netnames.stdout != '1')

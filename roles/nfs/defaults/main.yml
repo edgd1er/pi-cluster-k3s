@@ -1,0 +1,14 @@
+---
+
+mount_point_usb: []
+mount_point_nfs: []
+
+required_packages:
+  - nfs-common
+  - nfs-client
+
+extra_packages: []
+
+nfsd_services: []
+
+nfsd_enable: 0

@@ -1,0 +1,17 @@
+---
+
+- name: Create user {{ raspi_config_create_user }}
+  user:
+    name: "{{ raspi_config_create_user.name }}"
+  changed_when: true
+
+- name: "Add your login key to {{ raspi_config_create_user.name }}"
+  authorized_key:
+    user: "{{ raspi_config_create_user.name }}"
+    key: "{{ lookup('file', raspi_config_create_user.path_to_ssh_key) }}"
+
+- name: "Add {{ raspi_config_create_user.name }} to sudoers"
+  lineinfile:
+  args:
+    dest: /etc/sudoers
+    line: "{{ raspi_config_create_user.name }} ALL=(ALL) NOPASSWD: ALL"

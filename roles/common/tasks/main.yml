@@ -1,0 +1,44 @@
+---
+- name: What is my inventory_hostname
+  debug:
+    msg: "inventory/actual hostname is {{ inventory_hostname }} / {{ ansible_hostname }}"
+
+#Get some basic info
+- name: Get Raspberry Pi type
+  shell: "raspi-config nonint get_pi_type"
+  register: pi_type
+  changed_when: False
+
+- name: Show pi version
+  debug:
+    msg: "Pi version: {{ pi_type.stdout }}"
+  changed_when: false
+
+#Network interface names
+- name: Get network names status
+  shell: "raspi-config nonint get_net_names"
+  register: pi_netnames
+  changed_when: False
+
+  #- name: Print all available facts
+  #  ansible.builtin.debug:
+  #    var: ansible_facts
+
+  #    - name: test
+  #      import_tasks: ~/.ansible/roles/mikolak-net.raspi_config/tasks/raspi-config-1-user-password.yml
+
+- name: config raspi
+  import_role:
+    name: mikolak-net.raspi_config
+
+- name: reboot
+  shell: "sleep 1 && shutdown -r now +1"
+  async: 1
+  poll: 0
+  notify:
+    - wait for reboot
+
+- name: wait for reboot
+  wait_for_connection:
+    delay: "{{ raspi_config_reboot_min_time }}"
+    timeout: "{{ raspi_config_reboot_max_wait_time }}"
