@@ -32,6 +32,6 @@ raspi_config_other_options:
   - cgroup_memory=1
   - cgroup_enable=cpuset
 # network interface names predictable
-raspi_config_network_netnames: true
+raspi_config_network_netnames: false
 # enable swap file size, 0 to disable
 raspi_config_advanced_swapfile: 0
