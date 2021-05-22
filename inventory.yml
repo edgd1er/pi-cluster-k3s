@@ -1,0 +1,24 @@
+---
+all:
+  hosts:
+    netpi01:
+      ansible_host: netpi01
+    netpi02:
+      ansible_host: netpi02
+  children:
+    cluster:
+      hosts:
+        netpi01: {}
+        netpi02: {}
+    k3s_coordinator:
+      hosts:
+        netpi01: {}
+    k3s_worker:
+      hosts:
+        netpi02: {}
+    monitoring_server:
+      hosts:
+        netpi01: {}
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    remote_user: pi

@@ -22,7 +22,7 @@
   apt:
     state: present
     name: nfs-kernel-server
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: create dir for storage"
@@ -32,21 +32,21 @@
     mode: 0777
     owner: root
     group: root
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: get UUID_value from partition {{ cluster_name }}"
   # Read device information (always use unit when probing)
   shell: "blkid | grep {{ cluster_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
   register: UUID_cluster_value
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: get UUID_value from partition {{ master_name }}"
   # Read device information (always use unit when probing)
   shell: "blkid | grep {{ master_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
   register: UUID_master_value
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfs: Print all available facts"
@@ -56,7 +56,7 @@
   with_items:
     - UUID_cluster_value.stdout
     - UUID_master_value.stdout
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: Mount up device by UUID"
@@ -66,7 +66,7 @@
     fstype: ext4
     opts: defaults,noatime
     state: mounted
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: Mount up device by UUID"
@@ -76,7 +76,7 @@
     fstype: ext4
     opts: defaults,noatime
     state: mounted
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: Configure exports"
@@ -86,8 +86,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-
-  when: ansible_hostname == nfsserver_name
+  when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: Enable and start nfsserver services"
@@ -96,7 +95,7 @@
     enabled: true
     state: started
   loop: "{{ nfsserver_services }}"
-  when: nfs_enable and (nfsserver_services|length > 0) and (ansible_hostname == nfsserver_name)
+  when: nfs_enable and (nfsserver_services|length > 0) and (inventory_hostname in groups['k3s_coordinator'])
   tags: [ nfsserver ]
   notify:
     - reload nfsserver
@@ -108,7 +107,7 @@
     enabled: false
     state: stopped
   loop: "{{ nfs-serve_services }}"
-  when: (not nfs_enable|bool ) or ( nfsserver_services|length < 1 ) and (ansible_hostname != nfsserver_name)
+  when: (not nfs_enable|bool ) or ( nfsserver_services|length < 1 ) and (inventory_hostname in groups['k3s_coordinator'])
   tags: [ nfsserver ]
 
 # ------------ nfs clients ------------
@@ -120,7 +119,7 @@
     mode: 0777
     owner: root
     group: root
-  when: ansible_hostname != nfsserver_name
+  when: inventory_hostname not in groups['k3s_coordinator']
   tags: nfsclient
 
 - name: "nfsclient: configure clients mount"
@@ -130,7 +129,7 @@
     fstype: nfs
     opts: "{{ nfsclient_options }}"
     state: mounted
-  when: ansible_hostname != nfsserver_name
+  when: inventory_hostname not in groups['k3s_coordinator']
   tags: nfsclient
 
 #-----------------------------------------------------------
