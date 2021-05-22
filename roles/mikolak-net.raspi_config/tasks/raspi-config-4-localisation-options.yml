@@ -4,54 +4,59 @@
 
 # I1 Change Locale
 - name: get locale
-  shell: "grep -v ^# /etc/locale.gen | cut -f1 -d' '"
+  shell:
+    cmd: "set -o pipefail; grep -v ^# /etc/locale.gen | cut -f1 -d' '"
+    executable: /bin/bash
   register: pi_locale
+  changed_when: false
 
 - name: show locale
   debug:
     msg: locale was {{ pi_locale.stdout }}, should be {{ raspi_config_localisation_locale }}
 
 - name: Change locale
-  shell: "raspi-config nonint do_change_locale {{ raspi_config_localisation_locale }}"
+  command: "raspi-config nonint do_change_locale {{ raspi_config_localisation_locale }}"
   when: raspi_config_localisation_locale != pi_locale.stdout
 
 # I2 Change Timezone
 - name: get timezone
-  shell: "cat /etc/timezone"
+  command: "cat /etc/timezone"
   register: pi_tz
+  changed_when: false
 
 - name: show TZ
   debug:
     msg: locale was {{ pi_tz.stdout }}, will be {{ raspi_config_localisation_timezone }}
 
 - name: Change timezone
-  shell: "raspi-config nonint do_change_timezone {{ raspi_config_localisation_timezone }}"
+  command: "raspi-config nonint do_change_timezone {{ raspi_config_localisation_timezone }}"
   when: raspi_config_localisation_timezone != pi_tz.stdout
 
 # I3 Change Keyboard Layout
 - name: get keyboard layout
-  shell: grep -Po '(?<=XKBLAYOUT=")([^"]+)' /etc/default/keyboard
+  command: grep -Po '(?<=XKBLAYOUT=")([^"]+)' /etc/default/keyboard
   register: kblayout
+  changed_when: false
 
 - name: Print keyboard layout
   debug:
     msg: "keyboard layout is: {{ kblayout.stdout }}"
 
 - name: Change keyboard layout
-  shell: "raspi-config nonint do_configure_keyboard {{ raspi_config_localisation_keyboard_layout }}"
+  command: "raspi-config nonint do_configure_keyboard {{ raspi_config_localisation_keyboard_layout }}"
   when: kblayout.stdout != raspi_config_localisation_keyboard_layout
 
 # I4 Change Wi-fi Country
 - name: Get WiFi country
-  shell: "raspi-config nonint get_wifi_country"
+  command: "raspi-config nonint get_wifi_country"
   register: wifi_country
-  changed_when: False
   ignore_errors: yes #to avoid error when WiFi is not present
+  changed_when: False
 
 - name: Print current WiFi country
   debug:
     msg: "Wifi country is: {{ wifi_country.stdout }}"
 
 - name: Set WiFi country
-  shell: "raspi-config nonint do_wifi_country {{ raspi_config_localisation_wifi_country }}"
-  when: (wifi_country.stdout != '') and (wifi_country.stdout != raspi_config_localisation_wifi_country)
+  command: "raspi-config nonint do_wifi_country {{ raspi_config_localisation_wifi_country }}"
+  when: (wifi_country.stdout |length > 0) and (wifi_country.stdout != raspi_config_localisation_wifi_country)

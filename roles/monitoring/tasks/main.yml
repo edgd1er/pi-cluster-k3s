@@ -6,7 +6,7 @@
       - libfontconfig1
 
 - name: Creating prometheus user group
-  group: name="{{groupId}}"
+  group: name="{{ groupId }}"
   become: yes
   become_user: root
   become_method: sudo
@@ -16,17 +16,18 @@
   become_user: root
   become_method: sudo
   user:
-    name: "{{userId}}"
-    group: "{{groupId}}"
+    name: "{{ userId }}"
+    group: "{{ groupId }}"
     system: yes
     shell: "/sbin/nologin"
-    comment: "{{userId}} nologin User"
+    comment: "{{ userId }} nologin User"
     createhome: "no"
     state: present
 
 - name: get cpu info
-  shell: "grep -Pom1 \"(?=ARM)([^ ]+)\" /proc/cpuinfo | tr '[:upper:]' '[:lower:]'"
+  shell: "set -o pipefail; grep -Pom1 \"(?=ARM)([^ ]+)\" /proc/cpuinfo | tr '[:upper:]' '[:lower:]'"
   register: cpu_type
+  changed_when: false
 
 - name: Install prometheus
   unarchive:
@@ -41,8 +42,8 @@
   copy:
     src: "/tmp/prometheus-{{ prometheusVersion }}.linux-{{ cpu_type.stdout }}/prometheus"
     dest: "/usr/local/bin/prometheus"
-    owner: "{{userId}}"
-    group: "{{groupId}}"
+    owner: "{{ userId }}"
+    group: "{{ groupId }}"
     remote_src: yes
     mode: 0755
 
@@ -55,22 +56,22 @@
   become: yes
   become_user: root
   become_method: sudo
-  file: 
+  file:
     path: "/data/prometheus/"
     state: directory
-    owner: "{{userId}}"
-    group: "{{groupId}}"
+    owner: "{{ userId }}"
+    group: "{{ groupId }}"
     mode: 0755
 
 - name: Creates directory
   become: yes
   become_user: root
   become_method: sudo
-  file: 
+  file:
     path: "/etc/prometheus/"
     state: directory
-    owner: "{{userId}}"
-    group: "{{groupId}}"
+    owner: "{{ userId }}"
+    group: "{{ groupId }}"
     mode: 0755
 
 - name: Display host
@@ -110,9 +111,10 @@
     method: GET
     status_code: 200
 
-- name: get cpu info
+- name: get cpu arch
   command: "dpkg --print-architecture"
   register: cpu_arch
+  changed_when: false
 
 - name: 'Download Grafana'
   get_url:

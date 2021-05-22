@@ -23,9 +23,17 @@
 
 - name: Install log2ram
   become: yes
-  ansible.builtin.command: ./install.sh
+  command: ./install.sh
+  register: log2ramres
   args:
     chdir: /tmp/log2ram
+    warn: no
+  failed_when: log2ramres.sterr is defined
+  changed_when: log2ramres.stdout|length > 0
+
+- name: Print log2ram install output
+  ansible.builtin.debug:
+    var: log2ramres.stdout
 
 - name: Cleanup installation files
   ansible.builtin.file:

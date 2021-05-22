@@ -24,9 +24,16 @@
 
 - name: Run the install script
   become: true
-  ansible.builtin.command: ./install.sh
+  command: ./install.sh
+  register: zramres
   args:
     chdir: /tmp/zram-swap-config
+  failed_when: zramres.sterr is defined
+  changed_when: zramres.stdout|length > 0
+
+- name: Print zram install output
+  ansible.builtin.debug:
+    var: zramres.stdout
 
 - name: Cleanup installation files
   ansible.builtin.file:
@@ -34,4 +41,10 @@
     state: absent
 
 - name: Disable default swap device
-  ansible.builtin.command: "dphys-swapfile swapoff && dphys-swapfile uninstall && update-rc.d dphys-swapfile disable"
+  command: "{{ item }}"
+  register: disable
+  with_items:
+    - dphys-swapfile swapoff
+    - dphys-swapfile uninstall
+    - /usr/sbin/update-rc.d dphys-swapfile remove
+  changed_when: false

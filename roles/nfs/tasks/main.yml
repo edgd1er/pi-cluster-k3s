@@ -2,7 +2,7 @@
 - name: install required packages
   apt:
     state: present
-    pkg: "{{ required_packages}}"
+    pkg: "{{ required_packages }}"
     autoclean: true
     autoremove: true
     update_cache: true
@@ -37,14 +37,18 @@
 
 - name: "nfsserver: get UUID_value from partition {{ cluster_name }}"
   # Read device information (always use unit when probing)
-  shell: "blkid | grep {{ cluster_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+  shell:
+    cmd: "set -o pipefail; blkid | grep {{ cluster_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+    executable: /bin/bash
   register: UUID_cluster_value
   when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: get UUID_value from partition {{ master_name }}"
   # Read device information (always use unit when probing)
-  shell: "blkid | grep {{ master_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+  shell:
+    cmd: "set -o pipefail; blkid | grep {{ master_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
+    executable: /bin/bash
   register: UUID_master_value
   when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver

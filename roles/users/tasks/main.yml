@@ -40,7 +40,7 @@
 - name: Copy a ssh pub to new_users var
   ansible.builtin.copy:
     src: "{{ item.1 }}"
-    dest: '{{item.0.home}}/{{item.0.name}}/.ssh/'
+    dest: '{{ item.0.home }}/{{ item.0.name }}/.ssh/'
     owner: "{{ item.0.name }}"
     group: "{{ item.0.name }}"
     mode: '0600'
@@ -53,7 +53,7 @@
 - name: Copy a ssh pub to existing_users var
   ansible.builtin.copy:
     src: "{{ item.1 }}"
-    dest: '{{item.0.home}}/{{item.0.name}}/.ssh/'
+    dest: '{{ item.0.home }}/{{ item.0.name }}/.ssh/'
     owner: "{{ item.0.name }}"
     group: "{{ item.0.name }}"
     mode: '0600'
@@ -65,7 +65,7 @@
 
 - name: Set authorized key with local pub keys for existing_users var
   ansible.posix.authorized_key:
-    user: "{{item.0.name}}"
+    user: "{{ item.0.name }}"
     key: '{{ item.1 }}'
     state: present
   loop: "{{ existing_users|product(local_pub_keys_to_authorized)|list }}"

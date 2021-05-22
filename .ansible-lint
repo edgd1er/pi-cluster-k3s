@@ -1,0 +1,10 @@
+skip_list:
+  - '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern'
+  - '204'  # Lines should be no longer than 160 chars'
+  - '602'  # Don't compare to empty string
+
+warn_list:
+ - '701'  # meta/main.yml should contain relevant info'
+ - '703'  # meta/main.yml default values should be changed'
+ - '208'  # temporary
+ - '502'  # All tasks should be named

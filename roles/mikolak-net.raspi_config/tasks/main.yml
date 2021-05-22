@@ -29,37 +29,21 @@
 - name: 7-configure raspberry options
   import_tasks: raspi-config-7-advanced-options.yml
 
-#- name: Set up zram
-#  import_tasks: zram.yml
-#  notify:
-#    - reboot
+- name: Set up zram
+  import_tasks: zram.yml
+  notify:
+    - reboot
+  when: zram|bool
+  tags: zram
 
-#- name: Set up log2ram
-#  import_tasks: log2ram.yml
-#  notify:
-#    - reboot
+- name: Set up log2ram
+  import_tasks: log2ram.yml
+  notify:
+    - reboot
+  when: log2ram|bool
+  tags: log2ram
 
-# - include_tasks: setup_create_user.yml
-#   when: raspi_config_create_users is defined and ( raspi_config_create_users | length > 0 )
-#   loop: "{{ raspi_config_create_users }}"
-#   loop_control:
-#     loop_var: raspi_config_create_user
-
-#- import_tasks: setup_replace_user.yml
-#  when: raspi_config_replace_user['name'] != None
-#
-#- import_tasks: security_check.yml
-
-
-#- name: ensure mem split
-#  pi_boot_config:
-#    config_vals: "gpu_mem={{ raspi_config_memory_split_gpu }}"
-#  notify:
-#    - apply raspi-config
-#    - reboot
-
-
-#- name: Disable services
-#  import_tasks: disable-services.yml
-#  notify:
-#    - reboot
+- name: Disable services
+  import_tasks: disable-services.yml
+  notify:
+    - reboot

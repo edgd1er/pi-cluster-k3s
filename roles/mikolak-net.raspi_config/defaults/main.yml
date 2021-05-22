@@ -92,3 +92,12 @@ raspi_config_advanced_hdmi_group: no # False
 raspi_config_advanced_hdmi_mod: no # False
 raspi_config_advanced_audio_out: 0 #0 Auto #1 Force 3.5mm jack #2 Force HDMI
 raspi_config_advanced_swapfile: 1 #0 to disable swap file
+
+#Zram
+# Based on
+# https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
+zram: false
+
+#log2ram:
+# Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
+log2ram: false

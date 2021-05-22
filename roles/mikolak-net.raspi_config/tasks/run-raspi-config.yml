@@ -1,22 +1,22 @@
 ---
 
 - name: Set user password configuration
-  import_tasks: raspi-config-1-user-password
+  import_tasks: raspi-config-1-user-password.yml
 
 - name: Set network options configuration
-  import_tasks: raspi-config-2-network-options
+  import_tasks: raspi-config-2-network-options.yml
 
 - name: Set boot options configuration
-  import_tasks: raspi-config-3-boot-options
+  import_tasks: raspi-config-3-boot-options.yml
 
 - name: Set localisation options configuration
-  import_tasks: raspi-config-4-localisation-options
+  import_tasks: raspi-config-4-localisation-options.yml
 
 - name: Set interfacing options configuration
-  import_tasks: raspi-config-5-interfacing-options
+  import_tasks: raspi-config-5-interfacing-options.yml
 
 - name: Set overclock configuration
-  import_tasks: raspi-config-6-overclock
+  import_tasks: raspi-config-6-overclock.yml
 
 - name: Set advanced options configuration
-  import_tasks: raspi-config-7-advanced-options
+  import_tasks: raspi-config-7-advanced-options.yml

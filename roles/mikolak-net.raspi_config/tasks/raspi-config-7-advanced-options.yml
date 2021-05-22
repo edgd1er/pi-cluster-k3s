@@ -4,7 +4,7 @@
 
 # A1 Expand Filesystem
 - name: Check if FS is expandable
-  shell: "raspi-config nonint get_can_expand"
+  command: "raspi-config nonint get_can_expand"
   register: fs_filled
   changed_when: False
 
@@ -14,12 +14,12 @@
   when: fs_filled.stdout == '0'
 
 - name: Expand Filesystem
-  shell: "raspi-config nonint do_expand_rootfs"
+  command: "raspi-config nonint do_expand_rootfs"
   when: raspi_config_expanded_filesystem and ( fs_filled.stdout == '0' )
 
 # A2 Overscan
 - name: Get Overscan status
-  shell: "raspi-config nonint get_overscan"
+  command: "raspi-config nonint get_overscan"
   register: pi_overscan
   changed_when: False
 
@@ -28,27 +28,27 @@
     msg: "Boot overscan is: {{ pi_overscan.stdout }}"
 
 - name: Enable Overscan
-  shell: "raspi-config nonint do_overscan {{ raspi_config_advanced_overscan }}"
+  command: "raspi-config nonint do_overscan {{ raspi_config_advanced_overscan }}"
   when: raspi_config_advanced_overscan
 
 # A3 Memory Split
 - name: Get current GPU memory split (1/4)
-  shell: "raspi-config nonint get_config_var gpu_mem /boot/config.txt"
+  command: "raspi-config nonint get_config_var gpu_mem /boot/config.txt"
   register: gpu_mem
   changed_when: False
 
 - name: Get current GPU memory split 256 (2/4)
-  shell: "raspi-config nonint get_config_var gpu_mem_256 /boot/config.txt"
+  command: "raspi-config nonint get_config_var gpu_mem_256 /boot/config.txt"
   register: gpu_mem_256
   changed_when: False
 
 - name: Get current GPU memory split 512 (3/4)
-  shell: "raspi-config nonint get_config_var gpu_mem_512 /boot/config.txt"
+  command: "raspi-config nonint get_config_var gpu_mem_512 /boot/config.txt"
   register: gpu_mem_512
   changed_when: False
 
 - name: Get current GPU memory split 1024 (4/4)
-  shell: "raspi-config nonint get_config_var gpu_mem_1024 /boot/config.txt"
+  command: "raspi-config nonint get_config_var gpu_mem_1024 /boot/config.txt"
   register: gpu_mem_1k
   changed_when: False
 
@@ -57,22 +57,24 @@
     msg: "Expected: {{ raspi_config_memory_split_gpu }} - Current GPU memory split: {{ gpu_mem.stdout }} - {{ gpu_mem_256.stdout }} - {{ gpu_mem_512.stdout }} - {{ gpu_mem_1k.stdout }}"
 
 - name: Set GPU memory split
-  shell: "raspi-config nonint do_memory_split {{ raspi_config_memory_split_gpu }}"
+  command: "raspi-config nonint do_memory_split {{ raspi_config_memory_split_gpu }}"
   when: gpu_mem.stdout != raspi_config_memory_split_gpu
 
 # A4 Audio
 ### 0 Auto, 1 Force 3.5mm, 2 Force hdmi
 - name: Set audio out
-  shell: "raspi-config nonint do_audio {{ raspi_config_advanced_audio_out }}"
+  command: "raspi-config nonint do_audio {{ raspi_config_advanced_audio_out }}"
+  when: raspi_config_advanced_audio_out in ['0', 0, '1', 1, '2', 2]
+  changed_when: false
 
 # A5 Resolution
 - name: Get HDMI group
-  shell: "raspi-config nonint get_config_var hdmi_group /boot/config.txt"
+  command: "raspi-config nonint get_config_var hdmi_group /boot/config.txt"
   register: hdmi_group
   changed_when: False
 
 - name: Get HDMI mode
-  shell: "raspi-config nonint get_config_var hdmi_mode /boot/config.txt"
+  command: "raspi-config nonint get_config_var hdmi_mode /boot/config.txt"
   register: hdmi_mode
   changed_when: False
 
@@ -81,11 +83,11 @@
     msg: "HDMI group and mode is: {{ hdmi_group.stdout }} - {{ hdmi_mode.stdout }}"
 
   #- name: Set HDMI group mode
-  #shell: "raspi-config nonint do_resolution {{ HDMI_GROUP }} {{ HDMI_MOD }}"
+  #command: "raspi-config nonint do_resolution {{ HDMI_GROUP }} {{ HDMI_MOD }}"
 
 # A6 Pixel Doubling
 - name: Get pixel doubling
-  shell: "raspi-config nonint get_pixdub"
+  command: "raspi-config nonint get_pixdub"
   register: pixdub_status
   changed_when: False
 
@@ -94,11 +96,11 @@
     msg: "Pixel Doubling is: {{ pixdub_status.stdout }}"
 
 - name: Enable pixel doubling
-  shell: "raspi-config nonint do_pixdub 0"
+  command: "raspi-config nonint do_pixdub 0"
   when: (raspi_config_advanced_pixel_doubling) and (pixdub_status.stdout != '0')
 
 - name: Disable pixel doubling
-  shell: "raspi-config nonint do_onewire 1"
+  command: "raspi-config nonint do_onewire 1"
   when: (not raspi_config_advanced_pixel_doubling) and (pixdub_status.stdout != '1')
 
 - name: Get swapfile status
@@ -119,7 +121,7 @@
     - /sbin/dphys-swapfile swapoff
     - /sbin/dphys-swapfile uninstall
     - /usr/sbin/update-rc.d dphys-swapfile remove
-  when: (raspi_config_advanced_swapfile == 0) and (swapon_size.stdout != '')
+  when: (raspi_config_advanced_swapfile == 0) and (swapon_size.stdout is defined)
 
 - name: Enable default swap device
   command: "{{ item }}"
@@ -130,8 +132,8 @@
     - /sbin/dphys-swapfile swapon
     - /sbin/dphys-swapfile install
     - /usr/sbin/update-rc.d dphys-swapfile install
-  when: (raspi_config_advanced_swapfile == 1) and (swapfile_size.stdout == '')
+  when: (raspi_config_advanced_swapfile == 1) and (swapfile_size.stdout is defined)
 
 # A7 GL Driver
 #- name: Set OpenGL desktop driver
-#shell: "raspi-config nonint do_gldriver {{ raspi_config_advanced_gldriver }}"
+#command: "raspi-config nonint do_gldriver {{ raspi_config_advanced_gldriver }}"

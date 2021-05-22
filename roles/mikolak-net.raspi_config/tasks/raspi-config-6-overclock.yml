@@ -4,7 +4,7 @@
 
 # Overclock
 - name: Get overclock
-  shell: "raspi-config nonint get_config_var arm_freq /boot/config.txt"
+  command: "raspi-config nonint get_config_var arm_freq /boot/config.txt"
   register: pi_overclock
   changed_when: False
 
@@ -13,5 +13,5 @@
     msg: "Overclock is: {{ pi_overclock.stdout }}"
 
 - name: Set overclock
-  shell: "raspi-config nonint do_overclock {{ OVERCLOCK }}"
+  command: "raspi-config nonint do_overclock {{ OVERCLOCK }}"
   when: raspi_config_overclock

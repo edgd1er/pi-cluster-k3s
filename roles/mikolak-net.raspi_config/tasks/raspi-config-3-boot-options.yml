@@ -4,7 +4,7 @@
 
 # B1 Desktop / CLI
 - name: Get boot CLI
-  shell: "raspi-config nonint get_boot_cli"
+  command: "raspi-config nonint get_boot_cli"
   register: boot_cli
   changed_when: False
 
@@ -13,7 +13,7 @@
     msg: "Boot CLI is: {{ boot_cli.stdout }}"
 
 - name: Get boot autologin
-  shell: "raspi-config nonint get_autologin"
+  command: "raspi-config nonint get_autologin"
   register: auto_login
   changed_when: False
 
@@ -23,11 +23,13 @@
 
 # B1 cli, B2 cli autologin, B3 desktop, B4 desktop autologin
 - name: Set Boot behaviour
-  shell: "raspi-config nonint do_boot_behaviour {{ raspi_config_boot_behaviour }}"
+  command: "raspi-config nonint do_boot_behaviour {{ raspi_config_boot_behaviour }}"
+  when: raspi_config_boot_behaviour |length >0
+
 
 # B2 Wait for Network at Boot
 - name: Get boot wait for network status
-  shell: "raspi-config nonint get_boot_wait"
+  command: "raspi-config nonint get_boot_wait"
   register: boot_wait
   changed_when: False
 
@@ -40,7 +42,7 @@
 
 # B3 Splash Screen
 - name: Get splash status
-  shell: "raspi-config nonint get_boot_splash"
+  command: "raspi-config nonint get_boot_splash"
   register: boot_splash
   changed_when: False
 
@@ -49,7 +51,7 @@
     msg: "Boot splash status is: {{ boot_splash.stdout }}, expected {{ raspi_config_boot_splash }}"
 
 - name: Set boot splash
-  shell: "raspi-config nonint do_boot_splash {{ raspi_config_boot_splash }}"
+  command: "raspi-config nonint do_boot_splash {{ raspi_config_boot_splash }}"
   when: boot_splash.stdout != raspi_config_boot_splash
   ignore_errors: true
 
