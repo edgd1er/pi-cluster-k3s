@@ -1,0 +1,15 @@
+---
+# defaults file for monitoring
+required_packages:
+  - nut-client
+  - procps
+  - iotop
+  - sysstat
+  - cockpit
+  - cockpit-docker
+  - cockpit-storaged
+  - cockpit-system
+  - cockpit-pcp
+  - lsof
+  - vim
+  - monit

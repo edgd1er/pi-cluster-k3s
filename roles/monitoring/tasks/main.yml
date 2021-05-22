@@ -1,0 +1,133 @@
+---
+- name: 'Install packages'
+  apt:
+    pkg:
+      - adduser
+      - libfontconfig1
+
+- name: Creating prometheus user group
+  group: name="{{groupId}}"
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: Creating prometheus user
+  become: yes
+  become_user: root
+  become_method: sudo
+  user:
+    name: "{{userId}}"
+    group: "{{groupId}}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{userId}} nologin User"
+    createhome: "no"
+    state: present
+
+- name: get cpu info
+  shell: "grep -Pom1 \"(?=ARM)([^ ]+)\" /proc/cpuinfo | tr '[:upper:]' '[:lower:]'"
+  register: cpu_type
+
+- name: Install prometheus
+  unarchive:
+    src: 'https://github.com/prometheus/prometheus/releases/download/v{{ prometheusVersion }}/prometheus-{{ prometheusVersion }}.linux-{{ cpu_type.stdout }}.tar.gz'
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy prometheus file to bin
+  become: yes
+  become_user: root
+  become_method: sudo
+  copy:
+    src: "/tmp/prometheus-{{ prometheusVersion }}.linux-{{ cpu_type.stdout }}/prometheus"
+    dest: "/usr/local/bin/prometheus"
+    owner: "{{userId}}"
+    group: "{{groupId}}"
+    remote_src: yes
+    mode: 0755
+
+- name: Delete prometheus tmp folder
+  file:
+    path: '/tmp/prometheus-{{ prometheusVersion }}.linux-{{ cpu_type.stdout }}'
+    state: absent
+
+- name: Creates directory
+  become: yes
+  become_user: root
+  become_method: sudo
+  file: 
+    path: "/data/prometheus/"
+    state: directory
+    owner: "{{userId}}"
+    group: "{{groupId}}"
+    mode: 0755
+
+- name: Creates directory
+  become: yes
+  become_user: root
+  become_method: sudo
+  file: 
+    path: "/etc/prometheus/"
+    state: directory
+    owner: "{{userId}}"
+    group: "{{groupId}}"
+    mode: 0755
+
+- name: Display host
+  debug:
+    var: "{{ item }}"
+  loop:
+    - inventory_hostname
+    - hostvars[inventory_hostname]['ansible_facts']
+
+- name: Display IP address
+  debug:
+    var: hostvars[inventory_hostname]['ansible_facts']['eth0']['ipv4']['address']
+
+- name: config file
+  template:
+    src: prometheus.conf.j2
+    dest: /etc/prometheus/prometheus.conf
+
+- name: Copy systemd init file
+  template:
+    src: init.service.j2
+    dest: /etc/systemd/system/prometheus.service
+  notify: systemd_reload
+
+- name: Start prometheus service
+  become: yes
+  become_user: root
+  become_method: sudo
+  service:
+    name: prometheus
+    state: started
+    enabled: yes
+
+- name: Check if prometheus is accessible
+  uri:
+    url: http://localhost:9090
+    method: GET
+    status_code: 200
+
+- name: get cpu info
+  command: "dpkg --print-architecture"
+  register: cpu_arch
+
+- name: 'Download Grafana'
+  get_url:
+    url: 'https://dl.grafana.com/oss/release/grafana_{{ grafanaVersion }}_{{ cpu_arch.stdout }}.deb'
+    dest: /tmp/
+
+- name: 'Install Grafana'
+  apt:
+    deb: '/tmp/grafana_{{ grafanaVersion }}_{{ cpu_arch.stdout }}.deb'
+
+- name: Start Grafana service
+  become: yes
+  become_user: root
+  become_method: sudo
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes

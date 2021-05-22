@@ -1,0 +1,8 @@
+---
+serviceName: "prometheus"
+userId: "prometheus"
+groupId: "prometheus"
+exec_command: "/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.conf --storage.tsdb.path=/data/prometheus --storage.tsdb.retention=2d "
+prometheusVersion: "2.27.1"
+prometheus_port: "9091"
+grafanaVersion: "7.0.0"

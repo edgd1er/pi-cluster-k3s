@@ -1,0 +1,12 @@
+- name: setup raspbian
+  hosts: monitoring_server
+  remote_user: pi
+  become: yes
+  gather_facts: yes
+  vars:
+    #0 = active , 1= inactive
+  roles:
+    - role: monitoring
+      tags: monit
+    - role: k3s
+      tags: k3s
