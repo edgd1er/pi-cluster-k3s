@@ -54,7 +54,9 @@
 
 - name: Print current GPU memory split
   debug:
-    msg: "Expected: {{ raspi_config_memory_split_gpu }} - Current GPU memory split: {{ gpu_mem.stdout }} - {{ gpu_mem_256.stdout }} - {{ gpu_mem_512.stdout }} - {{ gpu_mem_1k.stdout }}"
+    msg: >
+      Expected: {{ raspi_config_memory_split_gpu }} - Current GPU memory split: {{ gpu_mem.stdout }} -
+      {{ gpu_mem_256.stdout }} - {{ gpu_mem_512.stdout }} - {{ gpu_mem_1k.stdout }}
 
 - name: Set GPU memory split
   command: "raspi-config nonint do_memory_split {{ raspi_config_memory_split_gpu }}"

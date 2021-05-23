@@ -31,7 +31,8 @@
 
 - name: Install prometheus
   unarchive:
-    src: 'https://github.com/prometheus/prometheus/releases/download/v{{ prometheusVersion }}/prometheus-{{ prometheusVersion }}.linux-{{ cpu_type.stdout }}.tar.gz'
+    src: >
+      https://github.com/prometheus/prometheus/releases/download/v{{ prometheusVersion }}/prometheus-{{ prometheusVersion }}.linux-{{ cpu_type.stdout }}.tar.gz
     dest: /tmp/
     remote_src: yes
 
