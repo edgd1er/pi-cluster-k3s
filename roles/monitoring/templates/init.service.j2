@@ -1,11 +1,11 @@
 [Unit]
-Description={{serviceName}}
+Description={{service_name}}
 Wants=network-online.target
 After=network-online.target
 
 [Service]
-User={{ userId }}
-Group={{ groupId }}
+User={{ user_id }}
+Group={{ group_id }}
 Restart=always
 RestartSec=2
 StartLimitInterval=0

@@ -43,22 +43,26 @@ raspi_config_ensure_optimal_cpu_params: true
 
 # 2. Network Options
 raspi_config_network_hostname: pi
+# replace eth0 by a mac-addressed named interface
 raspi_config_network_netnames: no
 
 # 3. Boot Options
-raspi_config_boot_behaviour: "B1" #B1 cli, B2 cli autologin, B3 desktop, B4 desktop autologin
-raspi_config_boot_wait: no #False
-raspi_config_boot_splash: "0" #0 Auto, 1 Force 3.5mm, 2 Force hdmi
+# B1 cli, B2 cli autologin, B3 desktop, B4 desktop autologin
+raspi_config_boot_behaviour: "B1"
+# 0 =yes, 1 = No
+raspi_config_boot_wait: 0
+# 0 =yes, 1 = No
+raspi_config_boot_splash: 0
 
 # 4. Localisation Options
 # set global locale
 raspi_config_localisation_locale: 'fr_FR.UTF-8'
-# set timezone
-raspi_config_localisation_timezone: Europe/Paris #i.e. UTC, Europe/London, Australia/Adelaide
+# set timezone: UTC, Europe/London, Australia/Adelaide
+raspi_config_localisation_timezone: Europe/Paris
 # list of services that should be restarted if the timezone is changed
 raspi_config_localisation_timezone_dependent_services: []
 # set keyboard layout
-raspi_config_localisation_keyboard_layout: "fr" #default "gb"
+raspi_config_localisation_keyboard_layout: "fr"  # default "gb"
 # set Wifi country
 raspi_config_localisation_wifi_country: "FR"
 
@@ -74,30 +78,30 @@ raspi_config_interface_enable_rgpio: no
 
 # 6. Overclock Options
 raspi_config_overclock: no
-#see https://www.raspberrypi.org/documentation/configuration/config-txt/overclocking.md
-#https://haydenjames.io/raspberry-pi-2-overclock/
-#https://haydenjames.io/raspberry-pi-3-overclock/
-#https://magpi.raspberrypi.org/articles/how-to-overclock-raspberry-pi-4
-#OVERCLOCK:
+# see https://www.raspberrypi.org/documentation/configuration/config-txt/overclocking.md
+# https://haydenjames.io/raspberry-pi-2-overclock/
+# https://haydenjames.io/raspberry-pi-3-overclock/
+# https://magpi.raspberrypi.org/articles/how-to-overclock-raspberry-pi-4
+# OVERCLOCK:
 
 # 7. Advanced Options
 # have the FS fill the SD card
 raspi_config_expanded_filesystem: yes
-raspi_config_advanced_overscan: no # False
+raspi_config_advanced_overscan: no   # False
 # how much memory should be owned by the GPU (vs RAM)
 raspi_config_memory_split_gpu: 16
 raspi_config_advanced_pixel_doubling: no
-raspi_config_advanced_gldriver: no # False #G1 Full KMS, G2 Fake KMS, G3 Legacy
-raspi_config_advanced_hdmi_group: no # False
-raspi_config_advanced_hdmi_mod: no # False
-raspi_config_advanced_audio_out: 0 #0 Auto #1 Force 3.5mm jack #2 Force HDMI
-raspi_config_advanced_swapfile: 1 #0 to disable swap file
+raspi_config_advanced_gldriver: no   # False #G1 Full KMS, G2 Fake KMS, G3 Legacy
+raspi_config_advanced_hdmi_group: no   # no, no modification, 0 Auto-detect from EDID, 1 CEA, 2	DMT
+raspi_config_advanced_hdmi_mod: no   # no no midification, see https://www.raspberrypi.org/documentation/configuration/config-txt/video.md for values
+raspi_config_advanced_audio_out: 0   # 0  Auto #1 Force 3.5mm jack #2 Force HDMI
+raspi_config_advanced_swapfile: 1   # 0 to disable swap file
 
-#Zram
+# Zram
 # Based on
 # https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
 zram: false
 
-#log2ram:
+# log2ram:
 # Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
 log2ram: false

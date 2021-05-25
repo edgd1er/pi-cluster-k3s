@@ -4,7 +4,7 @@ raspi_config_update_packages: yes
 raspi_config_expanded_filesystem: yes
 # how much memory should be owned by the GPU (vs RAM)
 raspi_config_memory_split_gpu: 16
-#currently sets Pi2 OC setting if applicable
+# currently sets Pi2 OC setting if applicable
 raspi_config_ensure_optimal_cpu_params: no
 # set global locale
 raspi_config_locale: fr_FR.UTF-8
@@ -21,18 +21,18 @@ raspi_config_enable_camera: no
 raspi_config_fail_on_auth_test: yes
 # user to replace the default "pi" user with
 # NOTE: if you use this for the first time as "pi", any post_tasks will fail!
-#raspi_config_replace_user:
+# raspi_config_replace_user:
 #  name: None
 #  path_to_ssh_key: #LOCAL path to your public key file
 # use this to add any additional options to the config in raw form
 raspi_config_other_options: {}
 # enable netnames
 raspi_config_netnames: false
-#enable vnc
+# enable vnc
 raspi_config_enable_interface_vnc: false
-#enable ssh service
+# enable ssh service
 raspi_config_interface_enable_ssh: false
-#enable i2c
+# enable i2c
 raspi_config_interface_enable_i2c: false
 # enable spi
 raspi_config_interface_enable_spi: false
@@ -41,13 +41,13 @@ raspi_config_interface_enable_onewire: false
 raspi_config_interface_enable_rgpio: false
 # BOOTBEHAVIOUR: "B1" #B1 cli, B2 cli autologin, B3 desktop, B4 desktop autologin
 raspi_config_boot_behaviour: B1
-#activate predictable network names
+# activate predictable network names
 raspi_config_network_netnames:
 # audio out 0 Auto #1 Force 3.5mm jack #2 Force HDMI
 raspi_config_advanced_audio_out: 0
 # enable swap file size, 0 to disable
 raspi_config_advanced_swapfile: 0
-#Number of seconds to wait before starting to poll
+# Number of seconds to wait before starting to poll
 raspi_config_reboot_min_time: 5
 # wait this many seconds before forcing connection retry after reboot
 raspi_config_reboot_max_wait_time: 300

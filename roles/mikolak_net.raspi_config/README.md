@@ -21,6 +21,8 @@ Additions
 Requirements
 ------------
 
+`pip3 install "ansible-lint[core,yamllint]"`
+
 None, other than installing the role itself. To do that, create a `requirements.yml` file next to your playbook with
 the following contents:
 

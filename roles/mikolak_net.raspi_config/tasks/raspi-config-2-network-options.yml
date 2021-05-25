@@ -17,8 +17,8 @@
   when: pi_hostname.stdout != inventory_hostname
 
 # N2 Wi-fi
-#- name: Set WiFi credentials
-  #shell: "raspi-config nonint do_wifi_ssid_passphrase {{ SSID }} {{ PASSPHRASE }}"
+# - name: Set WiFi credentials
+#  shell: "raspi-config nonint do_wifi_ssid_passphrase {{ SSID }} {{ PASSPHRASE }}"
 
 # N3 Network interface names
 - name: Get network names status

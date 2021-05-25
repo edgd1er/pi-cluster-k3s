@@ -1,10 +1,10 @@
 ---
-#Role raspi-config
+# Role raspi-config
 # set global locale
 raspi_config_locale: fr_FR.UTF-8
 # set timezone
 raspi_config_timezone: Europe/Paris
-#enable ssh service
+# enable ssh service
 raspi_config_interface_enable_ssh: true
 # ensure camera support is on - CURRENTLY UNVERIFIED
 raspi_config_enable_camera: no
@@ -14,13 +14,12 @@ raspi_config_memory_split_gpu: 16
 raspi_config_update_packages: no
 # have the FS fill the SD card
 raspi_config_expanded_filesystem: yes
-#currently sets Pi2 OC setting if applicable
+# currently sets Pi2 OC setting if applicable
 raspi_config_ensure_optimal_cpu_params: no
 # list of services that should be restarted if the timezone is changed
 raspi_config_timezone_dependent_services: [ ]
-# set hostname
-#raspi_config_hostname: "{{ inventory_hostname }}"
-#raspi_config_hostname: "zorro"
+# set hostname (defined with ansible_host)
+# raspi_config_hostname: "{{ inventory_hostname }}"
 # wait this many seconds before forcing connection retry after reboot
 raspi_config_reboot_max_wait_time: 300
 # use this to add any additional options to the config in raw form
@@ -31,16 +30,16 @@ raspi_config_other_options:
   - cgroup_enable=memory
   - cgroup_memory=1
   - cgroup_enable=cpuset
-# network interface names predictable
+# replace eth0 by a mac-addressed named interface
 raspi_config_network_netnames: false
 # enable swap file size, 0 to disable
 raspi_config_advanced_swapfile: 0
 
-#Zram
+# Zram
 # Based on
 # https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
 zram: true
 
-#log2ram:
+# log2ram:
 # Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
 log2ram: true

@@ -1,8 +1,8 @@
 ---
 
 - name: Get Raspberry Pi type
-  #bug ansible FQDN: https://github.com/ansible/ansible/pull/71824
-  #ansible.builtin.command: raspi-config nonint get_pi_type
+  # bug ansible FQDN: https://github.com/ansible/ansible/pull/71824
+  # ansible.builtin.command: raspi-config nonint get_pi_type
   command: raspi-config nonint get_pi_type
   register: pi_type
   changed_when: False

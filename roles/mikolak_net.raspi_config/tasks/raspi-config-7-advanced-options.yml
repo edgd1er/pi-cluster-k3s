@@ -84,8 +84,9 @@
   debug:
     msg: "HDMI group and mode is: {{ hdmi_group.stdout }} - {{ hdmi_mode.stdout }}"
 
-  #- name: Set HDMI group mode
-  #command: "raspi-config nonint do_resolution {{ HDMI_GROUP }} {{ HDMI_MOD }}"
+- name: Set HDMI group mode
+  command: "raspi-config nonint do_resolution {{ raspi_config_advanced_hdmi_group }} {{ raspi_config_advanced_hdmi_mod }}"
+  when: ( raspi_config_advanced_hdmi_group in [ 0, 1, 2 ] ) and (not raspi_config_advanced_hdmi_group|bool )
 
 # A6 Pixel Doubling
 - name: Get pixel doubling
@@ -116,8 +117,6 @@
 
 - name: Disable default swap device
   command: "{{ item }}"
-  args:
-    warn: false # set warn=false to prevent warning
   with_items:
     - /bin/sed -i -E 's/(CONF_SWAPSIZE=)(.*)/\10/g' /etc/dphys-swapfile
     - /sbin/dphys-swapfile swapoff
@@ -127,15 +126,14 @@
 
 - name: Enable default swap device
   command: "{{ item }}"
-  args:
-    warn: false # set warn=false to prevent warning
   with_items:
     - /bin/sed -i -E 's/(CONF_SWAPSIZE=)(.*)/\1100/g' /etc/dphys-swapfile
     - /sbin/dphys-swapfile swapon
     - /sbin/dphys-swapfile install
     - /usr/sbin/update-rc.d dphys-swapfile install
   when: (raspi_config_advanced_swapfile == 1) and (swapfile_size.stdout is defined)
+  # changed_when: false
 
 # A7 GL Driver
-#- name: Set OpenGL desktop driver
-#command: "raspi-config nonint do_gldriver {{ raspi_config_advanced_gldriver }}"
+# - name: Set OpenGL desktop driver
+# command: "raspi-config nonint do_gldriver {{ raspi_config_advanced_gldriver }}"

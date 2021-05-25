@@ -5,16 +5,21 @@
 - name: Populate service facts
   ansible.builtin.service_facts:
 
+
 - name: Print service facts
   ansible.builtin.debug:
-    var: service_state.ansible_facts.services["log2ram.service"].state
+    var: ansible_facts.services["log2ram.service"].state
+  when: ansible_facts.services["log2ram.service"] is defined
 
 - name: Stop log2ram service if running
   become: yes
   ansible.builtin.service:
     name: log2ram
     state: stopped
-  when: service_state.ansible_facts.services["log2ram.service"] is defined
+  when: >
+    ( service_state.ansible_facts.services["log2ram.service"] is defined ) and
+    (service_state.ansible_facts.services["log2ram.service"].state == "running")
+
 
 - name: Clone the log2ram repository
   ansible.builtin.git:
@@ -28,8 +33,8 @@
   args:
     chdir: /tmp/log2ram
     warn: no
-  failed_when: log2ramres.sterr is defined
-  changed_when: log2ramres.stdout|length > 0
+  failed_when: (log2ramres.sterr is defined ) or (log2ram |regex_search("ERROR"))
+  changed_when: log2ramres.stdout is defined
 
 - name: Print log2ram install output
   ansible.builtin.debug:

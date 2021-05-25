@@ -13,20 +13,21 @@
 
 - name: Disable bluetooth services
   become: yes
-  ignore_errors: yes
   systemd:
     name: "{{ item }}"
     state: stopped
     enabled: no
   loop: "{{ raspi_config_bluetooth_services }}"
   when: raspi_config_unwanted_services is defined and 'bluetooth' in raspi_config_unwanted_services
+  failed_when: false
+  changed_when: false
 
 - name: Disable unwanted services
   become: yes
-  ignore_errors: yes
   systemd:
     name: "{{ item }}"
     state: stopped
     enabled: no
   loop: "{{ raspi_config_unwanted_services }}"
   when: raspi_config_unwanted_services is defined and ( raspi_config_unwanted_services | length > 0 )
+  failed_when: false

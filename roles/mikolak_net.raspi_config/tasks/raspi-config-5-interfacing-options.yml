@@ -51,12 +51,10 @@
 - name: Enable VNC
   command: "raspi-config nonint do_vnc 0"
   when: raspi_config_interface_enable_vnc and (vnc_status.stdout != '0')
-  ignore_errors: yes #to avoid error when var is not set
 
 - name: Disable VNC
   command: "raspi-config nonint do_vnc 1"
   when: (not raspi_config_interface_enable_vnc) and (vnc_status.stdout != '1')
-  ignore_errors: yes #to avoid error when var is not set
 
 # P4 SPI
 - name: Get SPI status

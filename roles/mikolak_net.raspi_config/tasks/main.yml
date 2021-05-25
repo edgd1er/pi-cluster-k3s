@@ -14,7 +14,7 @@
   when: raspi_config_update_packages
 
 # done through user module in users role
-#- name: 1-configure pi user
+# - name: 1-configure pi user
 #  import_tasks: raspi-config-1-user-password.yml
 - name: 2-configure raspberry network
   import_tasks: raspi-config-2-network-options.yml

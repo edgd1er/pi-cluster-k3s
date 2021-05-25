@@ -37,8 +37,11 @@
   debug:
     msg: "Boot wait is: {{ boot_wait.stdout }}"
 
-#- name: Set boot wait network status
-  #shell: "raspi-config nonint do_boot_wait {{ raspi_config_boot_wait }}"
+- name: Set boot wait network status
+  ansible.builtin.command: "raspi-config nonint do_boot_wait {{ raspi_config_boot_wait }}"
+  register: bootwait
+  when: boot_wait.stdout != raspi_config_boot_wait
+  changed_when: bootwait.stderr is undefined
 
 # B3 Splash Screen
 - name: Get splash status
@@ -53,7 +56,8 @@
 - name: Set boot splash
   command: "raspi-config nonint do_boot_splash {{ raspi_config_boot_splash }}"
   when: boot_splash.stdout != raspi_config_boot_splash
-  ignore_errors: true
+  failed_when: false  # always return failed
+  changed_when: false
 
 - name: ensure correct CPU parameters for Pi2
   ensure_pi2_oc:

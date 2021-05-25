@@ -1,6 +1,8 @@
 ---
 
 galaxy_info:
+  namespace: mikolaj_net
+  role_name: raspi_config
   author: Mikołaj Koziarkiewicz
   description: Sets up basic configuration for a headless Raspberry Pi Raspbian server.
   company: mikołak

@@ -50,8 +50,8 @@
 - name: Get WiFi country
   command: "raspi-config nonint get_wifi_country"
   register: wifi_country
-  ignore_errors: yes #to avoid error when WiFi is not present
   changed_when: False
+  failed_when: false
 
 - name: Print current WiFi country
   debug:
@@ -60,3 +60,6 @@
 - name: Set WiFi country
   command: "raspi-config nonint do_wifi_country {{ raspi_config_localisation_wifi_country }}"
   when: (wifi_country.stdout |length > 0) and (wifi_country.stdout != raspi_config_localisation_wifi_country)
+  # does not handle failure for pi without wifi (1,2)
+  failed_when: false
+  changed_when: false

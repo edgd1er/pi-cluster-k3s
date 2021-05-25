@@ -8,14 +8,17 @@
 
 - name: Print service facts
   ansible.builtin.debug:
-    var: service_state.ansible_facts.services["zram-swap-config.service"].state
+    var: ansible_facts.services["zram-swap-config.service"].state
+  when: ansible_facts.services["zram-swap-config.service"] is defined
 
 - name: Stop zram-swap-config service if running
   become: yes
   ansible.builtin.service:
     name: zram-swap-config
     state: stopped
-  when: service_state.ansible_facts.services["zram-swap-config.service"] is defined
+  when: >
+    ( ansible_facts.services["zram-swap-config.service"] is defined ) and
+    ( ansible_facts.services["zram-swap-config.service"].state == "running")
 
 - name: Clone zram-config project
   ansible.builtin.git:
@@ -28,8 +31,8 @@
   register: zramres
   args:
     chdir: /tmp/zram-swap-config
-  failed_when: zramres.sterr is defined
-  changed_when: zramres.stdout|length > 0
+  failed_when: ( zramres.sterr is defined ) and (zramres |regex_search("ERROR"))
+  changed_when: zramres.stdout is defined
 
 - name: Print zram install output
   ansible.builtin.debug:

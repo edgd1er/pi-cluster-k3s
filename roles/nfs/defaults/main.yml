@@ -1,14 +1,25 @@
 ---
-
-mount_point_usb: []
-mount_point_nfs: []
+# enable nfs on server and client
+nfs_enable: 0
+# server with hd connected to
+nfsserver_name: ""
+nfsserver_exports: [ ]
+nfsserver_services:
+  - nfs-server.service
+# mount point for nfs server
+mount_point_usb_master: {}
+mount_point_usb_cluster: {}
+# partition's names
+cluster_name: {}
+master_name: {}
+# mount point for nfs client
+mount_point_nfs: {}
+#  host.myserver.com:/home /mnt/home nfs rw,hard,intr,rsize=8192,wsize=8192,timeo=14 0 0
+nfsclient_options: rw,hard,rsize=8192,wsize=8192,timeo=14
 
 required_packages:
+  - apt-transport-https
+  - software-properties-common
   - nfs-common
-  - nfs-client
 
 extra_packages: []
-
-nfsd_services: []
-
-nfsd_enable: 0

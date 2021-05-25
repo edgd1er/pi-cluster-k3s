@@ -40,7 +40,7 @@
   shell:
     cmd: "set -o pipefail; blkid | grep {{ cluster_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
     executable: /bin/bash
-  register: UUID_cluster_value
+  register: uuid_cluster_value
   when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
@@ -49,23 +49,23 @@
   shell:
     cmd: "set -o pipefail; blkid | grep {{ master_name }} |grep -Po '(?<= UUID=\")([^\"]+)'"
     executable: /bin/bash
-  register: UUID_master_value
+  register: uuid_master_value
   when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfs: Print all available facts"
   debug:
-    #var: ansible_facts
+    # var: ansible_facts
     var: "{{ item }}"
   with_items:
-    - UUID_cluster_value.stdout
-    - UUID_master_value.stdout
+    - uuid_cluster_value.stdout
+    - uuid_master_value.stdout
   when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
 - name: "nfsserver: Mount up device by UUID"
   ansible.posix.mount:
-    src: UUID={{ UUID_cluster_value.stdout }}
+    src: UUID={{ uuid_cluster_value.stdout }}
     path: "{{ mount_point_usb_cluster }}"
     fstype: ext4
     opts: defaults,noatime
@@ -75,7 +75,7 @@
 
 - name: "nfsserver: Mount up device by UUID"
   ansible.posix.mount:
-    src: UUID={{ UUID_master_value.stdout }}
+    src: UUID={{ uuid_master_value.stdout }}
     path: "{{ mount_point_usb_master }}"
     fstype: ext4
     opts: defaults,noatime
@@ -136,4 +136,4 @@
   when: inventory_hostname not in groups['k3s_coordinator']
   tags: nfsclient
 
-#-----------------------------------------------------------
+# -----------------------------------------------------------

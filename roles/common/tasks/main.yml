@@ -3,7 +3,7 @@
   debug:
     msg: "inventory/actual hostname is {{ inventory_hostname }} / {{ ansible_hostname }}"
 
-#Get some basic info
+# Get some basic info
 - name: Get Raspberry Pi type
   command: "raspi-config nonint get_pi_type"
   register: pi_type
@@ -14,18 +14,16 @@
     msg: "Pi version: {{ pi_type.stdout }}"
   changed_when: false
 
-#Network interface names
+# Network interface names
 - name: Get network names status
   command: "raspi-config nonint get_net_names"
   register: pi_netnames
   changed_when: False
 
-  #- name: Print all available facts
-  #  ansible.builtin.debug:
-  #    var: ansible_facts
-
-  #    - name: test
-  #      import_tasks: ~/.ansible/roles/mikolak-net.raspi_config/tasks/raspi-config-1-user-password.yml
+- name: Print all available facts
+  ansible.builtin.debug:
+    var: ansible_facts
+  when: false
 
 - name: Update all packages to the latest version
   apt:
@@ -36,7 +34,7 @@
 
 - name: config raspi
   import_role:
-    name: mikolak-net.raspi_config
+    name: mikolak_net.raspi_config
 
 - name: reboot
   become: yes

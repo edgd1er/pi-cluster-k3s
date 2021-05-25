@@ -21,7 +21,7 @@
   user: name={{ raspi_config_auth_test_username }} state=absent force=yes
   async: 0
   poll: 0
-  ignore_errors: true
+  failed_when: false
 
 - name: restart timezone dependent services
   service:

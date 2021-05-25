@@ -1,20 +1,20 @@
 ---
-#enable nfs on server and client
+# enable nfs on server and client
 nfs_enable: 1
-#server with hd connected to
+# server with hd connected to
 nfsserver_name: "netpi01"
 nfsserver_exports: [ "/media/cluster_data  192.168.53.0/24(rw,sync,no_root_squash,no_subtree_check)" ]
 nfsserver_services:
   - nfs-server.service
-#mount point for nfs server
+# mount point for nfs server
 mount_point_usb_master: "/media/master_data"
 mount_point_usb_cluster: "/media/cluster_data"
-#partition's names
+# partition's names
 cluster_name: "CLUSTER_DATA"
 master_name: "MASTER_DATA"
-#mount point for nfs client
+# mount point for nfs client
 mount_point_nfs: "/media/cluster_data"
-# host.myserver.com:/home /mnt/home nfs rw,hard,intr,rsize=8192,wsize=8192,timeo=14 0 0
+#  host.myserver.com:/home /mnt/home nfs rw,hard,intr,rsize=8192,wsize=8192,timeo=14 0 0
 nfsclient_options: rw,hard,rsize=8192,wsize=8192,timeo=14
 
 required_packages:
