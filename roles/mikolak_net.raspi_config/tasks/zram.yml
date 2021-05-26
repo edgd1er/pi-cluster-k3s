@@ -59,3 +59,9 @@
     - dphys-swapfile uninstall
     - /usr/sbin/update-rc.d dphys-swapfile remove
   changed_when: false
+
+- name: uninstall
+  become: yes
+  shell: chmod +x /usr/local/bin/zram-swap-config-uninstall.sh && sudo /usr/local/bin/zram-swap-config-uninstall.sh
+  changed_when: false
+  when: not zram and zram_uninstall

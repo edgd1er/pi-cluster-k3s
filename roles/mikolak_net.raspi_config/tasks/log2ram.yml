@@ -52,3 +52,9 @@
   ansible.builtin.file:
     path: /tmp/log2ram
     state: absent
+
+- name: uninstall
+  become: yes
+  shell: chmod +x /usr/local/bin/uninstall-log2ram.sh && /usr/local/bin/uninstall-log2ram.sh
+  changed_when: false
+  when: not log2ram and log2ram_uninstall

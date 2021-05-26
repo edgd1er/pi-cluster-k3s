@@ -101,6 +101,7 @@ raspi_config_advanced_swapfile: 1   # 0 to disable swap file
 # Based on
 # https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
 zram: false
+zram_uninstall: false
 
 
 # log2ram:
@@ -116,3 +117,4 @@ log2ram_mail: true
 log2ram_zl2r: false
 # COMP_ALG this is any compression algorithm listed in /proc/crypto
 log2ram_comp_alg: lz4
+log2ram_uninstall: false
