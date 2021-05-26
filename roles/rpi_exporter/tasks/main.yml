@@ -1,0 +1,70 @@
+---
+
+- name: get cpu info
+  shell: "set -o pipefail; grep -Pom1 \"(?=ARM)([^ ]+)\" /proc/cpuinfo | tr '[:upper:]' '[:lower:]'"
+  args:
+    executable: "/usr/bin/bash"
+  register: cpu_type
+  changed_when: false
+  failed_when: false
+
+- name: get latest version
+  shell: "set -o pipefail; curl --silent \"https://api.github.com/repos/lukasmalkmus/rpi_exporter/releases/latest\" | grep -Pom1 \"(?=v)(.*)\""
+  args:
+    executable: "/usr/bin/bash"
+  register: latest
+  failed_when: false
+  changed_when: false
+
+- name: print latest
+  debug:
+    msg: |
+      cpu_type: {{ cpu_type.stdout }} rpi_exporter latest: {{ latest.stdout }}
+
+- name: Creating RPi exporter user group
+  group: name="{{ group_id }}"
+
+- name: Creating RPi exporter user
+  user:
+    name: "{{ user_id }}"
+    group: "{{ group_id }}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{ user_id }} nologin User"
+    createhome: "no"
+    state: present
+
+
+- name: Install RPi Exporter
+  unarchive:
+    src: https://github.com/lukasmalkmus/rpi_exporter/releases/download/v{{ version }}/rpi_exporter-{{ version }}.linux-{{ cpu_type.stdout }}.tar.gz
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy RPi Exporter file to bin
+  become: yes
+  copy:
+    src: "/tmp/rpi_exporter-{{ version }}.linux-{{ cpu_type.stdout }}/rpi_exporter"
+    dest: "/usr/local/bin/rpi_exporter"
+    owner: "{{ user_id }}"
+    group: "{{ group_id }}"
+    remote_src: yes
+    mode: 0755
+
+- name: Delete RPi Exporter tmp folder
+  file:
+    path: '/tmp/rpi_exporter-{{ version }}.linux-{{ cpu_type.stdout }}/rpi_exporter'
+    state: absent
+
+- name: Copy systemd init file
+  template:
+    src: rpi_exporter.service.j2
+    dest: /etc/systemd/system/rpi_exporter.service
+    mode: 0640
+  notify: systemd_reload
+
+- name: Check if RPi exporter emits metrices
+  uri:
+    url: http://127.0.0.1:9243/metrics
+    method: GET
+    status_code: 200

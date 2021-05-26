@@ -28,7 +28,7 @@ scrape_configs:
     static_configs:
     - targets: ['localhost:{{ prometheus_port }}']
 
-{% for host in groups['monitoring_server'] %}
+{% for host in groups['cluster'] %}
 {% set ip_address = hostvars[host]['ansible_facts']['default_ipv4']['address'] %}
 
   - job_name: '{{ host }}'
@@ -38,8 +38,9 @@ scrape_configs:
 
     static_configs:
     - targets:
+      #rpi_exporter
       - '{{ ip_address }}:9243'
+      #node_exporter
       - '{{ ip_address }}:9100'
 
 {% endfor %}
-

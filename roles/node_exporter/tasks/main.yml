@@ -1,0 +1,71 @@
+---
+
+- name: get cpu info
+  shell: "set -o pipefail; grep -Pom1 \"(?=ARM)([^ ]+)\" /proc/cpuinfo | tr '[:upper:]' '[:lower:]'"
+  args:
+    executable: "/usr/bin/bash"
+  register: cpu_type
+  changed_when: false
+
+- name: get latest version
+  shell: "set -o pipefail; curl --silent \"https://api.github.com/repos/prometheus/node_exporter/releases/latest\" | grep -Pom1 \"(?=v)(.*)\""
+  args:
+    executable: "/usr/bin/bash"
+  register: latest
+  failed_when: false
+  changed_when: false
+
+- name: print latest
+  debug:
+    msg: |
+      cpu_type: {{ cpu_type.stdout }}
+      latest: {{ latest.stdout }}
+
+- name: Creating node_exporter user group
+  group: name="{{ group_id }}"
+  become: true
+
+- name: Creating node_exporter user
+  user:
+    name: "{{ user_id }}"
+    group: "{{ group_id }}"
+    system: yes
+    shell: "/sbin/nologin"
+    comment: "{{ user_id }} nologin User"
+    createhome: "no"
+    state: present
+
+- name: Install prometheus node exporter
+  unarchive:
+    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ version }}/node_exporter-{{ version }}.linux-{{ cpu_type.stdout }}.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+
+- name: Copy prometheus node exporter file to bin
+  become: yes
+  copy:
+    src: "/tmp/node_exporter-{{ version }}.linux-{{ cpu_type.stdout }}/node_exporter"
+    dest: "/usr/local/bin/node_exporter"
+    owner: "{{ user_id }}"
+    group: "{{ group_id }}"
+    remote_src: yes
+    mode: 0755
+
+- name: Delete node exporter tmp folder
+  file:
+    path: '/tmp/node_exporter-{{ version }}.linux-{{ cpu_type.stdout }}'
+    state: absent
+    mode: 0640
+
+- name: Copy systemd init file
+  template:
+    src: init.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    mode: 0640
+  notify: system_reload
+
+- name: Check if node exporter emits metrices
+  uri:
+    url: http://127.0.0.1:9100/metrics
+    method: GET
+    status_code: 200

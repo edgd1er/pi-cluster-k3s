@@ -13,6 +13,7 @@
     executable: "/usr/bin/bash"
   register: latest
   failed_when: false
+  changed_when: false
 
 - name: print latest
   debug:
@@ -99,6 +100,8 @@
   template:
     src: prometheus.conf.j2
     dest: /etc/prometheus/prometheus.conf
+    owner: prometheus
+    group: prometheus
     mode: 0640
 
 - name: Copy systemd init file

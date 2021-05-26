@@ -1,12 +1,20 @@
-- name: setup raspbian
-  hosts: monitoring_server
+- name: setup monitoring
+  hosts: cluster
   remote_user: pi
   become: yes
   gather_facts: yes
   vars:
-    #0 = active , 1= inactive
+  # 0 = active , 1= inactive
   roles:
     - role: monitoring
-      tags: monit
+      tags: monitoring
+      when: inventory_hostname in groups['k3s_coordinator']
+    - role: rpi_exporter
+      tags: rpi_exporter
+      when: inventory_hostname in groups['cluster']
+    - role: node_exporter
+      tags: node_exporter
+      when: inventory_hostname in groups['cluster']
     - role: k3s
       tags: k3s
+      when: inventory_hostname in groups['cluster']
