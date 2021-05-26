@@ -40,6 +40,14 @@
   ansible.builtin.debug:
     var: log2ramres.stdout
 
+- name: configure log2ram
+  template:
+    src: log2ram.conf.j2
+    dest: /etc/log2ram.conf
+    owner: root
+    group: root
+    mode: 0640
+
 - name: Cleanup installation files
   ansible.builtin.file:
     path: /tmp/log2ram

@@ -51,3 +51,11 @@ raspi_config_advanced_swapfile: 0
 raspi_config_reboot_min_time: 5
 # wait this many seconds before forcing connection retry after reboot
 raspi_config_reboot_max_wait_time: 300
+# Zram
+# Based on
+# https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
+zram: false
+
+# log2ram:
+# Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
+log2ram: false

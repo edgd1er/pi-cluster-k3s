@@ -13,3 +13,7 @@ raspi_config_auth_test_replace_info: User "pi" will be replaced by {{ raspi_conf
 raspi_config_auth_test_username: pi
 raspi_config_auth_test_password: raspberry
 raspi_config_reboot_min_time: 5
+log2ram_size: 140M
+log2ram_mail: true
+log2ram_zl2r: true
+log2ram_comp_alg: lz4

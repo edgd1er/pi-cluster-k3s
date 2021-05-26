@@ -102,6 +102,17 @@ raspi_config_advanced_swapfile: 1   # 0 to disable swap file
 # https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
 zram: false
 
+
 # log2ram:
 # Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
+# ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
 log2ram: false
+# Size for the ram folder, it defines the size the log folder will reserve into the RAM.
+log2ram_size: 40M
+# If there are some errors with available RAM space, a system mail will be send
+# Change it to false and you will have only a log if there is no place on RAM anymore.
+log2ram_mail: true
+# ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
+log2ram_zl2r: false
+# COMP_ALG this is any compression algorithm listed in /proc/crypto
+log2ram_comp_alg: lz4

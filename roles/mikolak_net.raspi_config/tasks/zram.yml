@@ -38,6 +38,14 @@
   ansible.builtin.debug:
     var: zramres.stdout
 
+- name: configure zram-swap
+  template:
+    src: zram-swap-config.conf.j2
+    dest: /etc/zram-swap-config.conf
+    owner: root
+    group: root
+    mode: 0640
+
 - name: Cleanup installation files
   ansible.builtin.file:
     path: /tmp/zram-swap-config
