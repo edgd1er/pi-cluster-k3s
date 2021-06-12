@@ -1,0 +1,81 @@
+---
+
+# install zram-swap : https://github.com/foundObjects/zram-swap.git
+
+- name: Display ram variables/facts known for a host
+  debug:
+    # var: hostvars[inventory_hostname]
+    msg: "_zram: {{ _zram }}, zram_mem_factor: {{ zram_mem_factor }}, _zram_fixedsize: {{ _zram_fixedsize }}"
+  tags: debug_info
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Print service facts
+  ansible.builtin.debug:
+    var: ansible_facts.services["zram-swap.service"].state
+  when: ansible_facts.services["zram-swap.service"] is defined
+
+- name: Stop zram-swap service if running
+  become: yes
+  ansible.builtin.service:
+    name: zram-swap
+    state: stopped
+  when: >
+    ( ansible_facts.services["zram-swap.service"] is defined ) and
+    ( ansible_facts.services["zram-swap.service"].state == "running")
+
+- name: Clone zram-swap project
+  ansible.builtin.git:
+    repo: 'https://github.com/foundObjects/zram-swap'
+    dest: /tmp/zram-swap
+    single_branch: yes
+    version: master
+
+- name: Run the install script
+  become: true
+  shell: "set -o pipefail; echo i | ./install.sh --install"
+  args:
+    chdir: /tmp/zram-swap
+  register: zramres
+  failed_when: ( zramres.stderr is defined ) and (zramres |regex_search("ERROR"))
+  changed_when: zramres.stdout is defined
+  when: _zram
+
+- name: Print zram install output
+  ansible.builtin.debug:
+    var: zramres.stdout
+
+- name: configure zram-swap
+  template:
+    src: zram-swap.j2
+    dest: /etc/default/zram-swap
+    owner: root
+    group: root
+    mode: 0640
+  when: _zram
+
+- name: uninstall
+  become: yes
+  command: ./install.sh --uninstall
+  register: zramres
+  args:
+    chdir: /tmp/zram-swap
+  failed_when: ( zramres.stderr is defined ) and (zramres |regex_search("ERROR"))
+  changed_when: zramres.stdout is defined
+  when: not _zram or _zram_uninstall
+
+- name: Cleanup installation files
+  ansible.builtin.file:
+    path: /tmp/zram-swap
+    state: absent
+
+- name: Disable default swap device
+  command: "{{ item }}"
+  register: disable
+  with_items:
+    - dphys-swapfile swapoff
+    - dphys-swapfile uninstall
+    - /usr/sbin/update-rc.d dphys-swapfile remove
+  changed_when: false
+  when: _zram

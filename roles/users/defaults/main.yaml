@@ -1,6 +1,6 @@
 ---
 new_users:
-  - { name: 'user', groups: 'sudo' , home: '/home', pub_keys: '{{ pub_ssh_keys }}', password: '<hashed_password>' }
+  - { name: 'user', groups: 'sudo', home: '/home', pub_keys: '{{ pub_ssh_keys }}', password: '<hashed_password>' }
 
 existing_users:
   - { name: 'pi', home: '/home', pub_keys: '{{ pub_ssh_keys }}', password: '<hashed_password>' }

@@ -1,5 +1,6 @@
 ---
-- debug:
+- name: Print name for new users
+  debug:
     msg: "{{ item.name }}"
   loop: "{{ new_users }}"
   when: false
@@ -18,6 +19,7 @@
     name: "{{ item.name }}"
     update_password: always
     password: "{{ item.password }}"
+  no_log: true
   loop: "{{ existing_users }}"
   loop_control:
     label: "new password for {{ item.name }}"
@@ -32,6 +34,7 @@
     system: no             # Defaults to no
     createhome: yes        # Defaults to yes
     home: "{{ item.home }}/{{ item.name }}"  # Defaults to /home/<username>
+  no_log: true
   loop: "{{ new_users }}"
   loop_control:
     label: "{{ item.name }} - {{ item.groups }}"
@@ -72,4 +75,3 @@
   loop_control:
     label: "{{ item.0.name }} - ssh_pub_key"
   when: true
-

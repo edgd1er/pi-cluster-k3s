@@ -3,22 +3,29 @@ all:
   hosts:
     netpi01:
       ansible_host: netpi01
+      # without vars, inventory vars take precedence over tasks vars.
+      zram_mem_factor: 25
+      _zram: true
+      _zram_fixedsize: 500M
     netpi02:
       ansible_host: netpi02
+      zram_mem_factor: 25
+      _zram: true
+      _zram_fixedsize: 500M
   children:
     cluster:
       hosts:
-        netpi01: {}
-        netpi02: {}
+        netpi01: { }
+        netpi02: { }
     k3s_coordinator:
       hosts:
-        netpi01: {}
+        netpi01: { }
     k3s_worker:
       hosts:
-        netpi02: {}
+        netpi02: { }
     monitoring_server:
       hosts:
-        netpi01: {}
+        netpi01: { }
   vars:
     ansible_python_interpreter: /usr/bin/python3
     remote_user: pi

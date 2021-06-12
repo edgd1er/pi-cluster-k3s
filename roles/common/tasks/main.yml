@@ -36,12 +36,12 @@
   import_role:
     name: mikolak_net.raspi_config
 
-- name: reboot
-  become: yes
-  ansible.builtin.reboot:
-    reboot_timeout: "{{ raspi_config_reboot_max_wait_time }}"
+# - name: reboot
+#  become: yes
+#  ansible.builtin.reboot:
+#    reboot_timeout: "{{ raspi_config_reboot_max_wait_time }}"
 
-- name: wait for reboot
-  wait_for_connection:
-    delay: "{{ raspi_config_reboot_min_time }}"
-    timeout: "{{ raspi_config_reboot_max_wait_time }}"
+# - name: wait for reboot
+#  wait_for_connection:
+#    delay: "{{ raspi_config_reboot_min_time }}"
+#    timeout: "{{ raspi_config_reboot_max_wait_time }}"

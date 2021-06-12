@@ -1,7 +1,7 @@
 ---
 
-# Based on
-# https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
+# Based on https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
+# install zram swap config: https://github.com/StuartIanNaylor/zram-swap-config.git
 
 - name: Populate service facts
   ansible.builtin.service_facts:
@@ -20,10 +20,12 @@
     ( ansible_facts.services["zram-swap-config.service"] is defined ) and
     ( ansible_facts.services["zram-swap-config.service"].state == "running")
 
-- name: Clone zram-config project
+- name: Clone zram-swap-config project
   ansible.builtin.git:
     repo: 'https://github.com/StuartIanNaylor/zram-swap-config.git'
     dest: /tmp/zram-swap-config
+    single_branch: yes
+    version: master
 
 - name: Run the install script
   become: true
@@ -31,8 +33,9 @@
   register: zramres
   args:
     chdir: /tmp/zram-swap-config
-  failed_when: ( zramres.sterr is defined ) and (zramres |regex_search("ERROR"))
+  failed_when: ( zramres.stderr is defined ) and (zramres |regex_search("ERROR"))
   changed_when: zramres.stdout is defined
+  when: zram
 
 - name: Print zram install output
   ansible.builtin.debug:
@@ -45,6 +48,7 @@
     owner: root
     group: root
     mode: 0640
+  when: zram
 
 - name: Cleanup installation files
   ansible.builtin.file:
@@ -60,8 +64,16 @@
     - /usr/sbin/update-rc.d dphys-swapfile remove
   changed_when: false
 
+- name: enable uninstall
+  become: yes
+  file:
+    path: /usr/local/bin/zram-swap-config-uninstall.sh
+    mode: 0744
+    owner: root
+    group: root
+
 - name: uninstall
   become: yes
-  shell: chmod +x /usr/local/bin/zram-swap-config-uninstall.sh && sudo /usr/local/bin/zram-swap-config-uninstall.sh
+  command: /usr/local/bin/zram-swap-config-uninstall.sh
   changed_when: false
-  when: not zram and zram_uninstall
+  when: not zram or zram_uninstall

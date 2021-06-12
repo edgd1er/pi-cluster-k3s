@@ -25,6 +25,8 @@
   ansible.builtin.git:
     repo: 'https://github.com/azlux/log2ram.git'
     dest: /tmp/log2ram
+    single_branch: yes
+    version: master
 
 - name: Install log2ram
   become: yes
@@ -53,8 +55,15 @@
     path: /tmp/log2ram
     state: absent
 
-- name: uninstall
+- name: enable uninstall
   become: yes
-  shell: chmod +x /usr/local/bin/uninstall-log2ram.sh && /usr/local/bin/uninstall-log2ram.sh
+  file:
+    path: /usr/local/bin/uninstall-log2ram.sh
+    mode: 0744
+    owner: root
+    group: root
+
+- name: enable uninstall
+  command: /usr/local/bin/uninstall-log2ram.sh
   changed_when: false
   when: not log2ram and log2ram_uninstall

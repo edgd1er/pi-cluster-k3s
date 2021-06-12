@@ -55,7 +55,21 @@ raspi_config_reboot_max_wait_time: 300
 # Based on
 # https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
 zram: false
+zram_uninstall: false
 
 # log2ram:
 # Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
+# ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
 log2ram: false
+# Size for the ram folder, it defines the size the log folder will reserve into the RAM.
+log2ram_size: 40M
+# If there are some errors with available RAM space, a system mail will be send
+# Change it to false and you will have only a log if there is no place on RAM anymore.
+log2ram_mail: true
+# ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
+log2ram_zl2r: false
+# COMP_ALG this is any compression algorithm listed in /proc/crypto
+log2ram_comp_alg: lz4
+log2ram_uninstall: false
+# Really a guestimate of a bit bigger than compression ratio whilst minimising 0.1% mem usage of disk size
+log2ram_uncompressed_disk_size: 100M
