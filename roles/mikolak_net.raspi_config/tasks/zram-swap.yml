@@ -38,13 +38,14 @@
   args:
     chdir: /tmp/zram-swap
   register: zramres
-  failed_when: ( zramres.stderr is defined ) and (zramres |regex_search("ERROR"))
+  failed_when: ( zramres.stderr is defined ) and (zramres.stdout |regex_search("ERROR"))
   changed_when: zramres.stdout is defined
   when: _zram
 
 - name: Print zram install output
   ansible.builtin.debug:
     var: zramres.stdout
+  when: _zram
 
 - name: configure zram-swap
   template:
@@ -52,7 +53,7 @@
     dest: /etc/default/zram-swap
     owner: root
     group: root
-    mode: 0640
+    mode: 0644
   when: _zram
 
 - name: uninstall

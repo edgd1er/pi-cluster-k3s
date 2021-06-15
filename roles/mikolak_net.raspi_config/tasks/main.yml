@@ -35,7 +35,7 @@
   import_tasks: raspi-config-7-advanced-options.yml
   tags: raspi
 
-- name: install required packages
+- name: package for ansible.builtin.expect
   apt:
     state: present
     pkg: "python-pexpect"
@@ -43,12 +43,16 @@
     autoremove: true
     update_cache: true
 
-- name: Set up zram
+- name: Set up zram-swap-config
   # https://github.com/StuartIanNaylor/zram-swap-config: I have problem with log2ram.
-  # import_tasks: zram-swap-config.yml
+  import_tasks: zram-swap-config.yml
+  when: zram|bool
+  tags: zram
+
+- name: Set up zram-swap
   # https://github.com/foundObjects/zram-swap
   import_tasks: zram-swap.yml
-  when: zram|bool
+  when: _zram|bool
   tags: zram
 
 - name: Set up log2ram

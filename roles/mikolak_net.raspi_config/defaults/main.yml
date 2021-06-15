@@ -116,7 +116,8 @@ raspi_config_auth_test_password: raspberry
 raspi_config_reboot_min_time: 5
 
 
-# Zram based on https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
+# Zram: choose either zram-swap-config or zram-swap.
+# based on https://ikarus.sg/using-zram-to-get-more-out-of-your-raspberry-pi/
 zram: false
 # MEM_FACTOR = Percentage of available ram to allocate to all zram swap devices which is divided equally by swap_devices number. 10 for RPI4
 zram_mem_factor: 25
