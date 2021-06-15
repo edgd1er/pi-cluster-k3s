@@ -1,35 +1,71 @@
+# -*- mode: yaml -*-
+# vim:ts=2:sw=2:ai:si:syntax=yaml
+#
+# yamllint configuration directives
+# Project Homepage: https://github.com/adrienverge/yamllint
+#
+# Overriding rules in files:
+# http://yamllint.readthedocs.io/en/latest/disable_with_comments.html
 ---
-ignore: |
-  venv/
-# Based on ansible-lint config
 extends: default
 
+ignore: |
+  .github
+  .idea
+
+# Rules documentation: http://yamllint.readthedocs.io/en/latest/rules.html
 rules:
+
   braces:
     max-spaces-inside: 1
     level: error
+
   brackets:
     max-spaces-inside: 1
     level: error
+
   colons:
     max-spaces-after: -1
     level: error
+
   commas:
     max-spaces-after: -1
     level: error
-  comments: enable
-  comments-indentation: enable
-  document-start: disable
+
+  comments: disable
+
+  comments-indentation: disable
+
+  document-start:
+    present: true
+
   empty-lines:
     max: 3
     level: error
+
   hyphens:
     level: error
-  indentation: enable
+
+  indentation:
+    # Requiring 2 space indentation
+    spaces: 2
+    # Requiring consistent indentation within a file, either indented or not
+    indent-sequences: true
+    # Lint indentation in multi-line strings
+    check-multi-line-strings: false
+
   key-duplicates: enable
-  line-length: disable
-  new-line-at-end-of-file: enable
+
+  line-length:
+    max: 160
+    level: warning
+    allow-non-breakable-inline-mappings: true
+
+  new-line-at-end-of-file: disable
+
   new-lines:
     type: unix
-  trailing-spaces: enable
+
+  trailing-spaces: disable
+
   truthy: disable

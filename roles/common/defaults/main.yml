@@ -1,3 +1,4 @@
+---
 # perform full update+upgrade
 raspi_config_update_packages: yes
 # have the FS fill the SD card

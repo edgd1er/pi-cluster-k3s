@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: edgd1er
   description: mount CLUSTER_DATA, export it through nfs for server, clients mount that exported nfs

@@ -1,3 +1,4 @@
+---
 - name: setup monitoring
   hosts: cluster
   remote_user: pi

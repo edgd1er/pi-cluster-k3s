@@ -1,3 +1,4 @@
+---
 - name: Restart the Prometheus service
   service:
     name: prometheus

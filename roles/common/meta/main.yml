@@ -1,3 +1,4 @@
+---
 galaxy_info:
   author: edgd1er
   description: Configure rapsberry pi through raspi-config tool (based on mikolak-net.raspi_config modified)
