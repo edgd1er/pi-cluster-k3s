@@ -1,3 +1,4 @@
+---
 - name: setup raspbian
   hosts: cluster
   remote_user: pi
@@ -6,8 +7,11 @@
   vars: []
   roles:
     - role: common
-      tags: raspi
     - role: users
       tags: users
     - role: nfs
       tags: nfs
+
+# ssh config
+# fail2ban
+# firewall ?
