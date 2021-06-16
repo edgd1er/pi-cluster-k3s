@@ -1,2 +1,15 @@
 ---
 # vars file for ansible-role-raspi-config
+# ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
+log2ram: true
+# Size for the ram folder, it defines the size the log folder will reserve into the RAM.
+log2ram_size: "100M"
+# If there are some errors with available RAM space, a system mail will be send
+# Change it to false and you will have only a log if there is no place on RAM anymore.
+log2ram_mail: "true"
+# ZL2R Zram Log 2 Ram enables a zram drive when ZL2R=true ZL2R=false is mem only tmpfs
+log2ram_zl2r: "true"
+# COMP_ALG this is any compression algorithm listed in /proc/crypto
+log2ram_comp_alg: "zstd"
+# Really a guestimate of a bit bigger than compression ratio whilst minimising 0.1% mem usage of disk size
+log2ram_uncompressed_disk_size: "290M"

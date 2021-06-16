@@ -1,25 +1,11 @@
 ---
 
 # Based on https://levelup.gitconnected.com/extend-the-lifespan-of-your-raspberry-pis-sd-card-with-log2ram-5929bf3316f2
-
-- name: Populate service facts
-  ansible.builtin.service_facts:
-
-
-- name: Print service facts
-  ansible.builtin.debug:
-    var: ansible_facts.services["log2ram.service"].state
-  when: ansible_facts.services["log2ram.service"] is defined
-
 - name: Stop log2ram service if running
-  become: yes
-  ansible.builtin.service:
+  ansible.builtin.systemd:
     name: log2ram
     state: stopped
-  when: >
-    ( service_state.ansible_facts.services["log2ram.service"] is defined ) and
-    (service_state.ansible_facts.services["log2ram.service"].state == "running")
-
+  failed_when: false
 
 - name: Clone the log2ram repository
   ansible.builtin.git:
@@ -35,8 +21,9 @@
   args:
     chdir: /tmp/log2ram
     warn: no
-  failed_when: (log2ramres.sterr is defined ) or (log2ram |regex_search("ERROR"))
-  changed_when: log2ramres.stdout is defined
+  failed_when: (log2ramres.stdout is not defined ) or ( log2ramres.stdout |regex_search("ERROR") )
+  changed_when: ( log2ramres.stdout is defined ) and ( log2ramres.stdout |regex_search("Reboot") )
+  when: log2ram
 
 - name: Print log2ram install output
   ansible.builtin.debug:
@@ -48,14 +35,14 @@
     dest: /etc/log2ram.conf
     owner: root
     group: root
-    mode: 0640
+    mode: 0644
 
 - name: Cleanup installation files
   ansible.builtin.file:
     path: /tmp/log2ram
     state: absent
 
-- name: enable uninstall
+- name: enable uninstall execution
   become: yes
   file:
     path: /usr/local/bin/uninstall-log2ram.sh
@@ -63,7 +50,7 @@
     owner: root
     group: root
 
-- name: enable uninstall
+- name: uninstall if requested
   command: /usr/local/bin/uninstall-log2ram.sh
   changed_when: false
   when: not log2ram and log2ram_uninstall
