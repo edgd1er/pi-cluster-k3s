@@ -1,5 +1,15 @@
 ---
+# ------------ monitoring packages ------------
+- name: install required packages
+  apt:
+    state: present
+    pkg: "{{ required_packages }}"
+    autoclean: true
+    autoremove: true
+    update_cache: true
+  when: (required_packages is defined ) and (required_packages|length > 0)
 
+# ------------ prometheus ------------
 - name: get cpu info
   shell: "set -o pipefail; grep -Pom1 \"(?=ARM)([^ ]+)\" /proc/cpuinfo | tr '[:upper:]' '[:lower:]'"
   args:
@@ -23,7 +33,7 @@
 - name: Display host
   debug:
     msg: >
-     "inv_name: {{ inventory_hostname }}, ipv4: {{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
+      "inv_name: {{ inventory_hostname }}, ipv4: {{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
 
 - name: 'Install packages'
   apt:
@@ -51,11 +61,8 @@
     state: present
 
 - name: Install prometheus
-  unarchive:
-    src: >
-      https://github.com/prometheus/prometheus/releases/download/
-      v{{ prometheus_version }}/
-      prometheus-{{ prometheus_version }}.linux-{{ cpu_type.stdout }}.tar.gz
+  ansible.builtin.unarchive:
+    src: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ cpu_type.stdout }}.tar.gz
     dest: /tmp/
     remote_src: yes
 

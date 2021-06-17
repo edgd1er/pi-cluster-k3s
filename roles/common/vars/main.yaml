@@ -59,3 +59,6 @@ log2ram_zl2r: true
 log2ram_comp_alg: zstd
 # Really a guestimate of a bit bigger than compression ratio whilst minimising 0.1% mem usage of disk size
 log2ram_uncompressed_disk_size: 280M
+
+# ---- sysstat ----
+sysstat: true

@@ -74,3 +74,31 @@ log2ram_comp_alg: lz4
 log2ram_uninstall: false
 # Really a guestimate of a bit bigger than compression ratio whilst minimising 0.1% mem usage of disk size
 log2ram_uncompressed_disk_size: 100M
+
+#enable network ups client
+# NONE, netclient, netserver, none
+nut_mode: "none"
+# ip address of nut server
+nut_server_ip: none
+nut_upsmon_password: none
+# master or slave
+nut_upsmon_type: slave
+#packages
+required_packages:
+  - apt-transport-https
+  - curl
+  - ca-certificates
+  - gnupg-agent
+  - software-properties-common
+  - fail2ban
+  - git
+  - procps
+  - iotop
+  - dnsutils
+  - nut-client
+  - vim
+  - lsof
+  - nut-client
+
+# ---- sysstat ----
+sysstat: false

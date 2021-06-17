@@ -31,7 +31,60 @@
     autoclean: true
     autoremove: true
     update_cache: true
+  tags: always
 
+- name: install required packages
+  apt:
+    state: present
+    pkg: "{{ required_packages }}"
+    autoclean: true
+    autoremove: true
+    update_cache: true
+  when: (required_packages is defined ) and (required_packages|length > 0)
+  tags: always
+
+# ---- sysstat ----
+- name: configure sysstat
+  ansible.builtin.lineinfile:
+    path: /etc/default/sysstat
+    regexp: '^ENABLED='
+    line: ENABLED="{{ sysstat|lower }}"
+  when: sysstat
+  tags: sysstat
+
+- name: Enable sysstat
+  ansible.builtin.systemd:
+    name: sysstat
+    state: started
+    enabled: yes
+  when: sysstat
+  tags: sysstat
+
+- name: Create a /var/log/sysstat if it does not exist
+  ansible.builtin.file:
+    path: /var/log/sysstat/
+    state: directory
+    mode: '0744'
+  when: sysstat
+  tags: sysstat
+
+- name: disable sysstat
+  ansible.builtin.systemd:
+    name: sysstat
+    state: stopped
+    enabled: no
+  when: not sysstat
+  tags: sysstat
+
+# ---- nut client ----
+- name: configure nut client
+  ansible.builtin.lineinfile:
+    path: /etc/nut/nut.conf
+    regexp: '^MODE='
+    line: MODE="{{ nut_mode }}"
+  tags: nut
+
+# ---- raspi ----
 - name: config raspi
   import_role:
     name: mikolak_net.raspi_config

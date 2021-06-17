@@ -23,8 +23,14 @@ molecule:
 flake8:
 		flake8
 
+poweroff:
+		ansible cluster -i inventory.yml -m shell -a 'sudo poweroff' -u pi
+
 raspi:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t raspi base_config.yml
+
+sysstat:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t sysstat base_config.yml
 
 zram:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t zram base_config.yml
@@ -37,3 +43,6 @@ users:
 
 nfs:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t nfs base_config.yml
+
+monitoring:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t monitoring monit_k3s.yml
