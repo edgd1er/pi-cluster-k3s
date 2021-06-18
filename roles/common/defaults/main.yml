@@ -79,10 +79,14 @@ log2ram_uncompressed_disk_size: 100M
 # NONE, netclient, netserver, none
 nut_mode: "none"
 # ip address of nut server
-nut_server_ip: none
-nut_upsmon_password: none
+nut_server_ip: "127.0.0.1:3493"
+nut_upsmon_user: "upsmonitor"
+nut_upsmon_password: "none"
 # master or slave
-nut_upsmon_type: slave
+nut_upsmon_type: "slave"
+#ups name to monitor
+nut_upsmon_name: "my_ups"
+
 #packages
 required_packages:
   - apt-transport-https

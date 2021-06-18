@@ -32,6 +32,9 @@ raspi:
 sysstat:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t sysstat base_config.yml
 
+nut:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t nut base_config.yml
+
 zram:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t zram base_config.yml
 

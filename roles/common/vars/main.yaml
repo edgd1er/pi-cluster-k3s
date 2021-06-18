@@ -62,3 +62,14 @@ log2ram_uncompressed_disk_size: 280M
 
 # ---- sysstat ----
 sysstat: true
+
+# ---- upsmon ----
+#enable network ups: NONE, netclient, netserver, none
+nut_mode: "netclient"
+# ip address of nut server
+nut_server_ip: "192.168.53.212:3493"
+nut_upsmon_password: "monitor2000"
+#ups name to monitor
+nut_upsmon_name: "mge"
+# master or slave
+nut_upsmon_type: "slave"

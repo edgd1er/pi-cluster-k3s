@@ -84,6 +84,30 @@
     line: MODE="{{ nut_mode }}"
   tags: nut
 
+- name: Create nut conf files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0640
+  loop:
+    - { src: upsmon.conf.j2, dest: /etc/nut/upsmon.conf }
+    - { src: upsd.users.j2, dest: /etc/nut/upsd.users }
+    - { src: upssched.conf.j2, dest: /etc/nut/upssched.conf }
+  notify:
+    - "Reload systemd nut-client"
+    - "Reload systemd nut-monitor"
+  tags: nut
+
+- name: Create upsd user file
+  template:
+    src: upsd.users.j2
+    dest: /etc/nut/upsd.users
+    mode: 0640
+  notify:
+    - "Reload systemd nut-client"
+    - "Reload systemd nut-monitor"
+  tags: nut
+
 # ---- raspi ----
 - name: config raspi
   import_role:

@@ -1,0 +1,12 @@
+---
+- name: Reload systemd nut-client
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: nut-client
+    state: started
+
+- name: Reload systemd nut-monitor
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: nut-monitor
+    state: started

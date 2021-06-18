@@ -1,0 +1,46 @@
+# MONITOR <system> <powervalue> <username> <password> ( master|slave)
+    MONITOR {{ nut_upsmon_name }}@{{ nut_server_ip }} 1 {{ nut_upsmon_user }} {{ nut_upsmon_password }} {{ nut_upsmon_type }}
+
+    # If you want that NUT can shutdown the computer, you need root privileges:
+    RUN_AS_USER nut
+
+    MINSUPPLIES 1
+    SHUTDOWNCMD \"/sbin/shutdown -h +0\"
+    NOTIFYCMD /usr/local/bin/nutNotify.sh
+    #POWERDOWNFLAG /var/lib/nutsoft/killpower
+    #POWERDOWNFLAG /var/tmp/killpower
+    #Dans la doc :
+    POWERDOWNFLAG /etc/killpower
+
+    RBWARNTIME 604800
+    NOCOMMWARNTIME 21600
+    FINALDELAY 5
+
+    POLLFREQ 15
+    POLLFREQALERT 30
+    HOSTSYNC 15
+    DEADTIME 45
+
+    #multiple instances running simultaneously
+
+    NOTIFYMSG ONLINE \"ONLINE %s\"
+    NOTIFYMSG ONBATT \"ONBATT %s\"
+    NOTIFYMSG LOWBATT \"LOWBATT %s\"
+    NOTIFYMSG FSD \"FSD %s\"
+    NOTIFYMSG COMMBAD \"COMMBAD %s\"
+    NOTIFYMSG COMMOK \"COMMOK %s\"
+    NOTIFYMSG SHUTDOWN \"SHUTDOWN %s\"
+    NOTIFYMSG REPLBATT \"REPLBATT %s\"
+    NOTIFYMSG NOCOMM \"NOCOMM %s\"
+
+    NOTIFYFLAG ONLINE SYSLOG+EXEC
+    NOTIFYFLAG ONBATT SYSLOG+EXEC
+    NOTIFYFLAG LOWBATT SYSLOG+WALL+EXEC
+    NOTIFYFLAG FSD SYSLOG+WALL+EXEC
+    NOTIFYFLAG COMMBAD SYSLOG+EXEC
+    NOTIFYFLAG COMMOK SYSLOG+EXEC
+    NOTIFYFLAG SHUTDOWN SYSLOG+WALL+EXEC
+    NOTIFYFLAG REPLBATT SYSLOG+EXEC
+    NOTIFYFLAG NOCOMM SYSLOG+EXEC
+
+    #NOTIFYMSG type message
