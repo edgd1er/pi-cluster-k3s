@@ -25,9 +25,19 @@
   when: inventory_hostname in groups['k3s_coordinator']
   tags: nfsserver
 
-- name: "nfsserver: create dir for storage"
+- name: "nfsserver: create dir for cluster shared storage"
   ansible.builtin.file:
-    path: "{{ mount_point_usb }}"
+    path: "{{ mount_point_usb_cluster }}"
+    state: directory
+    mode: 0777
+    owner: root
+    group: root
+  when: inventory_hostname in groups['k3s_coordinator']
+  tags: nfsserver
+
+- name: "nfsserver: create dir for master shared storage"
+  ansible.builtin.file:
+    path: "{{ mount_point_usb_master }}"
     state: directory
     mode: 0777
     owner: root

@@ -3,7 +3,8 @@
 nfs_enable: 1
 # server with hd connected to
 nfsserver_name: "netpi01"
-nfsserver_exports: [ "/media/cluster_data  192.168.53.0/24(rw,sync,no_root_squash,no_subtree_check)" ]
+nfsserver_exports: [ "/media/master_data  192.168.53.0/24(rw,sync,no_root_squash,no_subtree_check)",
+                     "/media/cluster_data  192.168.53.0/24(rw,sync,no_root_squash,no_subtree_check)"]
 nfsserver_services:
   - nfs-server.service
 # mount point for nfs server
@@ -23,21 +24,7 @@ required_packages:
   - ca-certificates
   - gnupg-agent
   - software-properties-common
-  - fail2ban
-  - git
-  - procps
-  - iotop
   - nfs-common
-  - dnsutils
-  - cockpit
-  - cockpit-docker
-  - cockpit-storaged
-  - cockpit-system
-  - cockpit-pcp
-  - nut-client
-  - sysstat
-  - vim
-  - lsof
 
 extra_packages:
   - sqlite3
