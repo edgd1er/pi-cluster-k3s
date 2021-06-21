@@ -10,3 +10,29 @@
     daemon_reload: true
     name: nut-monitor
     state: started
+
+# sysstat
+- name: Reload systemd sysstat
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: sysstat
+    state: started
+
+- name: Stop systemd sysstat
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: sysstat
+    state: stopped
+
+# fail2ban
+- name: Reload systemd fail2ban
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: fail2ban
+    state: started
+
+- name: Stop systemd fail2ban
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: fail2ban
+    state: stopped

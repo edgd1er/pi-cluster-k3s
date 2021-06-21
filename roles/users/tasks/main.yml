@@ -1,9 +1,9 @@
 ---
-- name: Print name for new users
+- name: Print name for processed users
   debug:
     msg: "{{ item.name }}"
-  loop: "{{ new_users }}"
-  when: false
+  loop: |
+   {{ new_users + existing_users }}
 
 - name: Ensure group named as user exists, for .ssh dir
   ansible.builtin.group:
@@ -12,14 +12,15 @@
   loop: "{{ new_users }}"
   loop_control:
     label: "{{ item.name }} - {{ item.groups }}"
-  when: true
 
 - name: update password of existing users
   user:
     name: "{{ item.name }}"
     update_password: always
     password: "{{ item.password }}"
-  no_log: true
+    groups: "{{ item.groups }}"
+    expires: -1
+  no_log: "{{ nolog }}"
   loop: "{{ existing_users }}"
   loop_control:
     label: "new password for {{ item.name }}"
@@ -28,17 +29,18 @@
   ansible.builtin.user:
     name: "{{ item.name }}"
     groups: "{{ item.groups }}"
+    append: yes
     password: "{{ item.password }}"
     state: present
     shell: /bin/bash       # Defaults to /bin/bash
     system: no             # Defaults to no
     createhome: yes        # Defaults to yes
     home: "{{ item.home }}/{{ item.name }}"  # Defaults to /home/<username>
-  no_log: true
+    expires: -1
+  no_log: "{{ nolog }}"
   loop: "{{ new_users }}"
   loop_control:
     label: "{{ item.name }} - {{ item.groups }}"
-  when: true
 
 - name: Copy a ssh pub to new_users var
   ansible.builtin.copy:
@@ -48,30 +50,18 @@
     group: "{{ item.0.name }}"
     mode: '0600'
     force: yes
-  loop: "{{ new_users|subelements('ssh_keys') }}"
+  loop: "{{ (new_users + existing_users) |subelements('ssh_keys') }}"
   loop_control:
     label: "{{ item.0.name }} - {{ item.1 }}"
-  when: true
-
-- name: Copy a ssh pub to existing_users var
-  ansible.builtin.copy:
-    src: "{{ item.1 }}"
-    dest: '{{ item.0.home }}/{{ item.0.name }}/.ssh/'
-    owner: "{{ item.0.name }}"
-    group: "{{ item.0.name }}"
-    mode: '0600'
-    force: yes
-  loop: "{{ existing_users|subelements('ssh_keys') }}"
-  loop_control:
-    label: "{{ item.0.name }} - {{ item.1 }}"
-  when: true
 
 - name: Set authorized key with local pub keys for existing_users var
   ansible.posix.authorized_key:
     user: "{{ item.0.name }}"
     key: '{{ item.1 }}'
     state: present
-  loop: "{{ existing_users|product(local_pub_keys_to_authorized)|list }}"
+  loop: "{{ (new_users + existing_users)|product(local_pub_keys_to_authorized)|list }}"
   loop_control:
-    label: "{{ item.0.name }} - ssh_pub_key"
-  when: true
+    label: "{{ item.0.name }} - creating authorized ssh_pub_key"
+
+- name: stop playbook
+  meta: end_play

@@ -87,6 +87,13 @@ nut_upsmon_type: "slave"
 #ups name to monitor
 nut_upsmon_name: "my_ups"
 
+# secure ssh
+ssh_deny_users: root
+ssh_allow_users: pi user clusadmin
+
+#fail2ban
+fail2ban_sshd_ignoreip:
+
 #packages
 required_packages:
   - apt-transport-https

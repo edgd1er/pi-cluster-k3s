@@ -42,10 +42,16 @@ log2ram:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t log2ram base_config.yml
 
 users:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t users base_config.yml
+		ansible-playbook -l cluster -i inventory.yml -u pi -t users base_config.yml -v
 
 nfs:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t nfs base_config.yml
+
+ssh:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t ssh base_config.yml
+
+fail2ban:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t fail2ban base_config.yml
 
 monitoring:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t monitoring monit_k3s.yml

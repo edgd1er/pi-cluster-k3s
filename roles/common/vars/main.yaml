@@ -73,3 +73,7 @@ nut_upsmon_password: "monitor2000"
 nut_upsmon_name: "mge"
 # master or slave
 nut_upsmon_type: "slave"
+
+# secure ssh
+ssh_deny_users: []
+fail2ban_sshd_ignoreip: "192.168.53.0/24"

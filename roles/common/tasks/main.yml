@@ -31,7 +31,7 @@
     autoclean: true
     autoremove: true
     update_cache: true
-  tags: always
+  #tags: always
 
 - name: install required packages
   apt:
@@ -40,8 +40,56 @@
     autoclean: true
     autoremove: true
     update_cache: true
-  when: (required_packages is defined ) and (required_packages|length > 0)
-  tags: always
+  when: required_packages| default([]) |length > 0
+  #tags: always
+
+# ---- ssh  ----
+- name: configure ssh allow users
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^AllowUsers '
+    line: AllowUsers {{ ssh_allow_users }}
+  when: ssh_allow_users | default([]) |length > 0
+  tags: ssh
+
+- name: add ssh deny users if ssh_deny_users is not empty
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^DenyUsers '
+    line: DenyUsers {{ ssh_deny_users }}
+  when: ssh_deny_users| default([])|length > 0
+  tags: ssh
+
+- name: remove ssh deny users if ssh_deny_users is empty
+  ansible.builtin.lineinfile:
+    state: absent
+    path: /etc/ssh/sshd_config
+    regexp: '^DenyUsers '
+    line: DenyUsers {{ ssh_deny_users }}
+  when: ssh_deny_users| default([])|length == 0
+  tags: ssh
+
+- name: configure sshd options
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^{{ item.split(' ')[0] }} "
+    line: "{{ item }}"
+  loop:
+    - ChallengeResponseAuthentication no
+    - PermitEmptyPasswords no
+    - PasswordAuthentication yes
+    - PermitRootLogin prohibit-password
+  tags: ssh
+
+# ---- fail2ban ----
+- name: add ignore ip to fail2ban sshd
+  become: yes
+  command: fail2ban-client set sshd addignoreip {{ fail2ban_sshd_ignoreip }}
+  when: fail2ban_sshd_ignoreip|length >3
+  notify: Reload systemd fail2ban
+  tags: fail2ban
+
+# ---- firewall ----
 
 # ---- sysstat ----
 - name: configure sysstat
@@ -58,6 +106,8 @@
     state: started
     enabled: yes
   when: sysstat
+  notify:
+    - "Reload systemd sysstat"
   tags: sysstat
 
 - name: Create a /var/log/sysstat if it does not exist
@@ -74,6 +124,8 @@
     state: stopped
     enabled: no
   when: not sysstat
+  notify:
+    - "Stop systemd sysstat"
   tags: sysstat
 
 # ---- nut client ----

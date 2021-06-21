@@ -1,4 +1,5 @@
 ---
+nolog: true
 new_users:
   - { name: 'user', groups: 'sudo', home: '/home', pub_keys: '{{ pub_ssh_keys }}', password: '<hashed_password>' }
 
