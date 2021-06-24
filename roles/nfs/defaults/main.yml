@@ -6,6 +6,9 @@ nfsserver_name: ""
 nfsserver_exports: [ ]
 nfsserver_services:
   - nfs-server.service
+nfs_statdopts: '--port 32765 --outgoing-port 32766'
+nfsserver_rpcmountdopts: '-p 32767'
+nfsserver_rpcrquotadopts: '-p 32769'
 # mount point for nfs server
 mount_point_usb_master: {}
 mount_point_usb_cluster: {}
@@ -14,12 +17,17 @@ cluster_name: {}
 master_name: {}
 # mount point for nfs client
 mount_point_nfs: {}
+# nfs quota
+nfsclient_quota: 0
+nfsclient_idmap: 'NO'
 #  host.myserver.com:/home /mnt/home nfs rw,hard,intr,rsize=8192,wsize=8192,timeo=14 0 0
-nfsclient_options: rw,hard,rsize=8192,wsize=8192,timeo=14
+nfsclient_options: rw,relatime,hard,rsize=1048576,wsize=1048576,timeo=14,proto=tcp,timeo=600,retrans=2,sec=sys,local_lock=none,clientaddr=
+  usrquota,grpquota
 
 required_packages:
   - apt-transport-https
   - software-properties-common
   - nfs-common
+  - quota
 
 extra_packages: []

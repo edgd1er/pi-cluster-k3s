@@ -26,6 +26,9 @@ flake8:
 poweroff:
 		ansible cluster -i inventory.yml -m shell -a 'sudo poweroff' -u pi
 
+ping:
+		ansible cluster -i inventory.yml -m ping -u pi
+
 raspi:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t raspi base_config.yml
 
@@ -45,7 +48,13 @@ users:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t users base_config.yml -v
 
 nfs:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t nfs base_config.yml
+		ansible-playbook -l cluster -i inventory.yml -u pi -t nfs base_config.yml -v
+
+nfsserver:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsserver base_config.yml
+
+nfsclient:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsclient base_config.yml
 
 ssh:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t ssh base_config.yml

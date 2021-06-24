@@ -7,6 +7,7 @@
     autoremove: true
     update_cache: true
   when: (required_packages is defined ) and (required_packages|length > 0)
+  tags: [ nfs, nfsserver, nfsclient ]
 
 - name: install extra packages
   apt:
@@ -16,6 +17,7 @@
     update_cache: true
     pkg: "{{ extra_packages }}"
   when: (extra_packages is defined ) and (extra_packages|length > 0)
+  tags: [ nfs, nfsserver, nfsclient ]
 
 # ------------ nfs server ------------
 - name: "nfsserver: install nfs service"
@@ -23,27 +25,29 @@
     state: present
     name: nfs-kernel-server
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: create dir for cluster shared storage"
   ansible.builtin.file:
-    path: "{{ mount_point_usb_cluster }}"
+    path: "{{ mount_point_export_cluster }}"
     state: directory
     mode: 0777
     owner: root
     group: root
+    recurse: true
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: create dir for master shared storage"
   ansible.builtin.file:
-    path: "{{ mount_point_usb_master }}"
+    path: "{{ mount_point_export_master }}"
     state: directory
     mode: 0777
     owner: root
     group: root
+    recurse: true
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: get UUID_value from partition {{ cluster_name }}"
   # Read device information (always use unit when probing)
@@ -52,7 +56,7 @@
     executable: /bin/bash
   register: uuid_cluster_value
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: get UUID_value from partition {{ master_name }}"
   # Read device information (always use unit when probing)
@@ -61,9 +65,9 @@
     executable: /bin/bash
   register: uuid_master_value
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
-- name: "nfs: Print all available facts"
+- name: "nfsserver: Print uuid facts"
   debug:
     # var: ansible_facts
     var: "{{ item }}"
@@ -71,27 +75,55 @@
     - uuid_cluster_value.stdout
     - uuid_master_value.stdout
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: Mount up device by UUID"
   ansible.posix.mount:
-    src: UUID={{ uuid_cluster_value.stdout }}
-    path: "{{ mount_point_usb_cluster }}"
+    src: "UUID={{ item.u }}"
+    path: "{{ item.p }}"
     fstype: ext4
     opts: defaults,noatime
     state: mounted
+  loop:
+    - { u: "{{ uuid_master_value.stdout }}", p: "{{ mount_point_export_master }}" }
+    - { u: "{{ uuid_cluster_value.stdout }}", p: "{{ mount_point_export_cluster }}" }
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
-- name: "nfsserver: Mount up device by UUID"
-  ansible.posix.mount:
-    src: UUID={{ uuid_master_value.stdout }}
-    path: "{{ mount_point_usb_master }}"
-    fstype: ext4
-    opts: defaults,noatime
-    state: mounted
+- name: "nfsserver: enable nfsv4 only"
+  ansible.builtin.lineinfile:
+    path: /etc/default/nfs-kernel-server
+    regexp: "^{{ item.split('=')[0] }}="
+    line: "{{ item }}"
+  loop:
+    - 'RPCMOUNTDOPTS="{{ nfsserver_rpcmountdopts }}"'
+    - 'RPCNFSDOPTS="{{ nfsserver_rpcnfsdopts }}"'
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
+
+- name: "nsfserver: disable rpcbind"
+  become: yes
+  ansible.builtin.shell: |
+    set -o pipefail
+    systemctl disable --now rpcbind.service rpcbind.socket
+    systemctl mask rpcbind.service rpcbind.socket
+  args:
+    executable: "/usr/bin/bash"
+  failed_when: false
+  when: false
+  tags: [ nfs ]
+
+
+- name: configure nfsserver quota
+  ansible.builtin.lineinfile:
+    path: /etc/default/quota
+    regexp: "^{{ item.split('=')[0] }}="
+    line: "{{ item }}"
+  loop:
+    - 'RPCMOUNTDOPTS="{{ nfsserver_rpcmountdopts }}"'
+    - 'RPCNFSDOPTS="{{ nfsserver_rpcnfsdopts }}"'
+  when: inventory_hostname in groups['k3s_coordinator'] and nfsclient_quota > 0
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: Configure exports"
   template:
@@ -110,7 +142,7 @@
     state: started
   loop: "{{ nfsserver_services }}"
   when: nfs_enable and (nfsserver_services|length > 0) and (inventory_hostname in groups['k3s_coordinator'])
-  tags: [ nfsserver ]
+  tags: [ nfsserver, nfs ]
   notify:
     - reload nfsserver
     - export nfs filesystem for client
@@ -125,6 +157,16 @@
   tags: [ nfsserver ]
 
 # ------------ nfs clients ------------
+- name: configure nfs ports on client and server
+  ansible.builtin.lineinfile:
+    path: /etc/default/nfs-common
+    regexp: "^{{ item.split('=')[0] }}="
+    line: "{{ item }}"
+  loop:
+    - 'STATDOPTS="{{ nfs_statdopts }}"'
+    - 'NEED_IDMAPD={{ nfsclient_idmap }}'
+  when: nfs_enable|bool
+  tags: [ nfsclient, nfsserver ]
 
 - name: "nfsclient: create mount point for nfs client"
   ansible.builtin.file:
@@ -136,14 +178,26 @@
   when: inventory_hostname not in groups['k3s_coordinator']
   tags: nfsclient
 
-- name: "nfsclient: configure clients mount"
+- name: "nfsclient: configure clients mount w/o quota"
   ansible.posix.mount:
-    src: "{{ nfsserver_name }}:{{ mount_point_usb_cluster }}"
+    src: "{{ nfsserver_name }}:{{ mount_point_export_cluster }}"
     path: "{{ mount_point_nfs }}"
     fstype: nfs
-    opts: "{{ nfsclient_options }}"
+    opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+    boot:   true
     state: mounted
-  when: inventory_hostname not in groups['k3s_coordinator']
+
+  when: inventory_hostname not in groups['k3s_coordinator'] and nfsclient_quota == 0
+  tags: nfsclient
+
+- name: "nfsclient: configure clients mount with quota"
+  ansible.posix.mount:
+    src: "{{ nfsserver_name }}:{{ mount_point_export_cluster }}"
+    path: "{{ mount_point_nfs }}"
+    fstype: nfs4
+    opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }},usrquota,grpquota"
+    state: mounted
+  when: inventory_hostname not in groups['k3s_coordinator'] and nfsclient_quota > 0
   tags: nfsclient
 
 # -----------------------------------------------------------
