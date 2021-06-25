@@ -1,10 +1,17 @@
 ---
 # handlers file for nfs
-- name: reload nfsserver
+- name: "reload nfsserver"
   ansible.builtin.systemd:
     name: "{{ item }}"
     state: "reloaded"
   loop: "{{ nfsserver_services }}"
+
+- name: "stop nfsserver"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: "stopped"
+  loop: "{{ nfsserver_services }}"
+
 
 - name: "export nfs filesystem for client"
   ansible.builtin.command: "exportfs -rsfav"

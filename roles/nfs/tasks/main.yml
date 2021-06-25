@@ -1,7 +1,7 @@
 ---
 - name: install required packages
   apt:
-    state: present
+    state: latest
     pkg: "{{ required_packages }}"
     autoclean: true
     autoremove: true
@@ -25,6 +25,7 @@
     state: present
     name: nfs-kernel-server
   when: inventory_hostname in groups['k3s_coordinator']
+  notify: stop nfsserver
   tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: create dir for cluster shared storage"
@@ -34,7 +35,6 @@
     mode: 0777
     owner: root
     group: root
-    recurse: true
   when: inventory_hostname in groups['k3s_coordinator']
   tags: [ nfs, nfsserver ]
 
@@ -45,7 +45,6 @@
     mode: 0777
     owner: root
     group: root
-    recurse: true
   when: inventory_hostname in groups['k3s_coordinator']
   tags: [ nfs, nfsserver ]
 
@@ -82,7 +81,7 @@
     src: "UUID={{ item.u }}"
     path: "{{ item.p }}"
     fstype: ext4
-    opts: defaults,noatime
+    opts: defaults,noatime,errors=remount-ro,usrquota,grpquota
     state: mounted
   loop:
     - { u: "{{ uuid_master_value.stdout }}", p: "{{ mount_point_export_master }}" }
@@ -113,8 +112,7 @@
   when: false
   tags: [ nfs ]
 
-
-- name: configure nfsserver quota
+- name: "nfsserver: configure quota ports"
   ansible.builtin.lineinfile:
     path: /etc/default/quota
     regexp: "^{{ item.split('=')[0] }}="
@@ -125,6 +123,33 @@
   when: inventory_hostname in groups['k3s_coordinator'] and nfsclient_quota > 0
   tags: [ nfs, nfsserver ]
 
+- name: "nfsserver: check quotas"
+  ansible.builtin.command:
+    cmd: "quotacheck -fugm {{ item }}"
+  loop:
+    - '{{ mount_point_export_master }}'
+    - '{{ mount_point_export_cluster }}'
+  when: inventory_hostname in groups['k3s_coordinator'] and nfsclient_quota > 0
+  tags: [ nfs, nfsserver ]
+
+- name: "nfsserver: activate quota checks"
+  ansible.builtin.command:
+    cmd: "quotaon -v {{ item }}"
+  loop:
+    - '{{ mount_point_export_master }}'
+    - '{{ mount_point_export_cluster }}'
+  when: inventory_hostname in groups['k3s_coordinator'] and nfsclient_quota > 0
+  failed_when: false
+  tags: [ nfs, nfsserver ]
+
+- name: "nfsserver: set quota"
+  become: yes
+  ansible.builtin.command:
+    cmd: "setquota -g users {{ nfsserver_quota_cluster }}"
+  when: inventory_hostname in groups['k3s_coordinator'] and nfsserver_quota_cluster|length > 3
+  failed_when: false
+  tags: [ nfs, nfsserver ]
+
 - name: "nfsserver: Configure exports"
   template:
     src: exports.j2
@@ -133,7 +158,7 @@
     group: "root"
     mode: "0644"
   when: inventory_hostname in groups['k3s_coordinator']
-  tags: nfsserver
+  tags: [ nfs, nfsserver ]
 
 - name: "nfsserver: Enable and start nfsserver services"
   systemd:
@@ -142,10 +167,10 @@
     state: started
   loop: "{{ nfsserver_services }}"
   when: nfs_enable and (nfsserver_services|length > 0) and (inventory_hostname in groups['k3s_coordinator'])
-  tags: [ nfsserver, nfs ]
   notify:
     - reload nfsserver
     - export nfs filesystem for client
+  tags: [ nfsserver, nfs ]
 
 - name: "nfsserver: Stop and disable nfsserver services"
   systemd:
@@ -154,7 +179,7 @@
     state: stopped
   loop: "{{ nfs-serve_services }}"
   when: (not nfs_enable|bool ) or ( nfsserver_services|length < 1 ) and (inventory_hostname in groups['k3s_coordinator'])
-  tags: [ nfsserver ]
+  tags: [ nfs, nfsserver ]
 
 # ------------ nfs clients ------------
 - name: configure nfs ports on client and server
@@ -166,7 +191,7 @@
     - 'STATDOPTS="{{ nfs_statdopts }}"'
     - 'NEED_IDMAPD={{ nfsclient_idmap }}'
   when: nfs_enable|bool
-  tags: [ nfsclient, nfsserver ]
+  tags: [ nfs, nfsclient, nfsserver ]
 
 - name: "nfsclient: create mount point for nfs client"
   ansible.builtin.file:
@@ -176,28 +201,27 @@
     owner: root
     group: root
   when: inventory_hostname not in groups['k3s_coordinator']
-  tags: nfsclient
+  tags: [ nfs, nfsclient ]
 
 - name: "nfsclient: configure clients mount w/o quota"
   ansible.posix.mount:
     src: "{{ nfsserver_name }}:{{ mount_point_export_cluster }}"
     path: "{{ mount_point_nfs }}"
-    fstype: nfs
+    fstype: nfs4
     opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-    boot:   true
+    boot: true
     state: mounted
-
   when: inventory_hostname not in groups['k3s_coordinator'] and nfsclient_quota == 0
-  tags: nfsclient
+  tags: [ nfs, nfsclient ]
 
 - name: "nfsclient: configure clients mount with quota"
   ansible.posix.mount:
     src: "{{ nfsserver_name }}:{{ mount_point_export_cluster }}"
     path: "{{ mount_point_nfs }}"
     fstype: nfs4
-    opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }},usrquota,grpquota"
+    opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
     state: mounted
   when: inventory_hostname not in groups['k3s_coordinator'] and nfsclient_quota > 0
-  tags: nfsclient
+  tags: [ nfs, nfsclient ]
 
 # -----------------------------------------------------------
