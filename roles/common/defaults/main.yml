@@ -94,6 +94,10 @@ ssh_allow_users: pi user clusadmin
 #fail2ban
 fail2ban_sshd_ignoreip:
 
+#Uncomplicated firewall
+rasp_firewall: false
+rasp_open_firewall_port: []
+
 #packages
 required_packages:
   - apt-transport-https

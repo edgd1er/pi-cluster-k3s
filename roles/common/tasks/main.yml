@@ -90,6 +90,43 @@
   tags: fail2ban
 
 # ---- firewall ----
+- name: firewall - install ufw
+  apt:
+    name: ufw
+    state: latest
+    update_cache: yes
+  register: apt_action
+  when: rasp_firewall
+  failed_when: apt_action.failed
+  tags: firewall
+
+- debug:
+    var: apt_action
+  tags: firewall
+
+- meta: end_play
+
+- name: Active Firewall.
+  ufw:
+    state: enabled
+    policy: deny
+  when: rasp_firewall
+  tags: firewall
+
+- name: Open ports defined by user.
+  ufw:
+    rule: allow
+    port: '{{ item }}'
+    from_ip: 192.168.53.0/24
+  with_items: "{{ rasp_open_firewall_port }}"
+  when: rasp_firewall and rasp_open_firewall_port|length > 1
+  tags: firewall
+
+- name: Disable Firewall.
+  ufw:
+    state: disabled
+  when: not rasp_firewall
+  tags: firewall
 
 # ---- sysstat ----
 - name: configure sysstat
