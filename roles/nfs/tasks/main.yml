@@ -132,7 +132,7 @@
   when: inventory_hostname in groups['k3s_coordinator'] and nfsclient_quota > 0
   tags: [ nfs, nfsserver ]
 
-- name: "nfsserver: activate quota checks"
+- name: "nfsserver: activate quota"
   ansible.builtin.command:
     cmd: "quotaon -v {{ item }}"
   loop:
@@ -142,13 +142,30 @@
   failed_when: false
   tags: [ nfs, nfsserver ]
 
-- name: "nfsserver: set quota"
+- name: "nfsserver: define quota"
   become: yes
   ansible.builtin.command:
     cmd: "setquota -g users {{ nfsserver_quota_cluster }}"
-  when: inventory_hostname in groups['k3s_coordinator'] and nfsserver_quota_cluster|length > 3
+  when: inventory_hostname in groups['k3s_coordinator'] and nfsserver_quota_cluster|length > 0
   failed_when: false
   tags: [ nfs, nfsserver ]
+
+- name: "nfsserver: report quota"
+  become: yes
+  ansible.builtin.command:
+    cmd: "repquota -vugsi  {{ item }}"
+  register: rep_quota
+  loop:
+    - "{{ mount_point_export_master }}"
+    - "{{ mount_point_export_cluster }}"
+  when: inventory_hostname in groups['k3s_coordinator'] and nfsserver_quota_cluster|length > 0
+  failed_when: false
+  tags: [ nfs, nfsserver ]
+
+- name: "nfsserver: display quotas"
+  debug:
+    var: rep_quota
+  when: inventory_hostname in groups['k3s_coordinator']
 
 - name: "nfsserver: Configure exports"
   template:
@@ -211,7 +228,7 @@
     opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
     boot: true
     state: mounted
-  when: inventory_hostname not in groups['k3s_coordinator'] and nfsclient_quota == 0
+  when: inventory_hostname not in groups['k3s_coordinator'] and nfsserver_quota_cluster|length == 0
   tags: [ nfs, nfsclient ]
 
 - name: "nfsclient: configure clients mount with quota"
@@ -221,7 +238,7 @@
     fstype: nfs4
     opts: "{{ nfsclient_options }}{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
     state: mounted
-  when: inventory_hostname not in groups['k3s_coordinator'] and nfsclient_quota > 0
+  when: inventory_hostname not in groups['k3s_coordinator'] and nfsserver_quota_cluster|length > 0
   tags: [ nfs, nfsclient ]
 
 # -----------------------------------------------------------
