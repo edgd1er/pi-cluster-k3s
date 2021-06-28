@@ -9,3 +9,4 @@ warn_list:
   - '703'  # meta/main.yml default values should be changed'
   - '208'  # temporary
   - '502'  # All tasks should be named
+  - '403'  # package-latest: Package installs should not use latest
