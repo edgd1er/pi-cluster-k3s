@@ -5,6 +5,8 @@ name: CI
   push:
     branches:
       - master
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   build:
@@ -26,7 +28,7 @@ jobs:
 
       - name: Lint code.
         run: |
-          yamllint .
+          yamllint -c .yamllint .
           ansible-lint
 
       - name: Lint Ansible Playbook
