@@ -62,7 +62,8 @@
 
 - name: Install prometheus
   ansible.builtin.unarchive:
-    src: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ cpu_type.stdout }}.tar.gz
+    src: >
+      {{ url_prefix }}/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ cpu_type.stdout }}.tar.gz
     dest: /tmp/
     remote_src: yes
 
@@ -105,7 +106,7 @@
     group: "{{ group_id }}"
     mode: 0755
 
-- name: config file
+- name: prometheus config file
   template:
     src: prometheus.conf.j2
     dest: /etc/prometheus/prometheus.conf
@@ -113,7 +114,7 @@
     group: prometheus
     mode: 0640
 
-- name: Copy systemd init file
+- name: Create systemd service file
   template:
     src: init.service.j2
     dest: /etc/systemd/system/prometheus.service

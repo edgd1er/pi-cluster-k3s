@@ -100,11 +100,15 @@
   failed_when: apt_action.failed
   tags: firewall
 
-- debug:
+- name: display apt_action
+  debug:
     var: apt_action
+  when: false
   tags: firewall
 
-- meta: end_play
+- name: stop playbook
+  meta: end_play
+  when: false
 
 - name: Active Firewall.
   ufw:
