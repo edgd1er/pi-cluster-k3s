@@ -33,7 +33,8 @@ jobs:
 
       - name: Lint Ansible Playbook
         # replace "master" with any valid ref
-        uses: ansible/ansible-lint-action@master
+        #uses: ansible/ansible-lint-action@master
+        uses: iranzo/ansible-lint-action@v4.1.1
         with:
           # [required]
           # Paths to ansible files (i.e., playbooks, tasks, handlers etc..)
@@ -49,7 +50,7 @@ jobs:
           # Must follow the example syntax.
           override-deps: |
             ansible==2.9
-            ansible-lint==4.2.0
+            ansible-lint==4.3.7
           # [optional]
           # Arguments to be passed to the ansible-lint
 
