@@ -118,7 +118,7 @@
   template:
     src: init.service.j2
     dest: /etc/systemd/system/prometheus.service
-    mode: 0640
+    mode: 0644
   notify: systemd_reload
 
 - name: Start prometheus service

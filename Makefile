@@ -24,13 +24,17 @@ flake8:
 		flake8
 
 poweroff:
-		ansible cluster -i inventory.yml -m shell -a 'sudo poweroff' -u pi
+		#ansible cluster -i inventory.yml -m shell -a 'sudo poweroff' -u pi
+		ansible-playbook -i inventory.yml -u pi play_shutdown.yml
 
 reboot:
 		ansible cluster -i inventory.yml -m shell -a 'sudo reboot' -u pi
 
 ping:
 		ansible cluster -i inventory.yml -m ping -u pi
+
+common:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t common base_config.yml
 
 raspi:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t raspi base_config.yml
@@ -57,7 +61,7 @@ nfsserver:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsserver base_config.yml
 
 nfsclient:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsclient base_config.yml -vv
+		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsclient base_config.yml
 
 ssh:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t ssh base_config.yml
@@ -66,7 +70,10 @@ fail2ban:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t fail2ban base_config.yml
 
 firewall:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t firewall base_config.yml -vv
+		ansible-playbook -l cluster -i inventory.yml -u pi -t firewall base_config.yml
 
 monitoring:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t monitoring monit_k3s.yml
+
+k3s:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t k3s monit_k3s.yml -vv

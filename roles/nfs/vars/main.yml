@@ -22,7 +22,7 @@ mount_point_nfs: "/media/cluster_data"
 # nfs quota
 nfsclient_idmap: 'YES'
 #  host.myserver.com:/home /mnt/home nfs rw,hard,intr,rsize=8192,wsize=8192,timeo=14 0 0
-nfsclient_options: rw,relatime,hard,intr,_netdev,rsize=1048576,wsize=1048576,timeo=14,proto=tcp,port=2049,timeo=600,retrans=2,sec=sys,local_lock=none,clientaddr=
+nfsclient_options: vers=4,rw,relatime,soft,_netdev,rsize=1048576,wsize=1048576,timeo=14,proto=tcp,port=2049,timeo=600,retrans=2,sec=sys,local_lock=none,clientaddr=
 required_packages:
   - apt-transport-https
   - curl

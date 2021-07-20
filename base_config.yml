@@ -5,8 +5,15 @@
   become: yes
   gather_facts: yes
   vars: []
+  tasks:
+    # ---- raspi ----
+    - name: config raspi
+      import_role:
+        name: mikolak_net.raspi_config
+      tags: raspi
   roles:
     - role: common
+      tags: common
     - role: users
       tags: users
     - role: nfs

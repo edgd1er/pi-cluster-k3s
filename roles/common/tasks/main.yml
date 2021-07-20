@@ -28,6 +28,7 @@
 - name: Update all packages to the latest version
   apt:
     upgrade: dist
+    force_apt_get: yes
     autoclean: true
     autoremove: true
     update_cache: true
@@ -200,11 +201,6 @@
     - "Reload systemd nut-client"
     - "Reload systemd nut-monitor"
   tags: nut
-
-# ---- raspi ----
-- name: config raspi
-  import_role:
-    name: mikolak_net.raspi_config
 
 # - name: reboot
 #  become: yes
