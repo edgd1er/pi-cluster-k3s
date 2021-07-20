@@ -26,15 +26,21 @@ jobs:
       - name: Install test dependencies.
         run: pip3 install ansible-core yamllint ansible-lint
 
-      - name: Lint code.
+      - name: yamllint
+        continue-on-error: true
         run: |
           yamllint -c .yamllint .
+
+      - name: ansible-lint code
+        continue-on-error: true
+        run: |
           ansible-lint
 
       - name: Lint Ansible Playbook
+        if: always()
         # replace "master" with any valid ref
         #uses: ansible/ansible-lint-action@master
-        uses: iranzo/ansible-lint-action@v4.1.1
+        uses: ansible/ansible-lint-action@master
         with:
           # [required]
           # Paths to ansible files (i.e., playbooks, tasks, handlers etc..)
