@@ -51,6 +51,7 @@
     regexp: '^AllowUsers '
     line: AllowUsers {{ ssh_allow_users }}
   when: ssh_allow_users | default([]) |length > 0
+  notify: restart systemd sshd
   tags: ssh
 
 - name: add ssh deny users if ssh_deny_users is not empty
@@ -59,6 +60,7 @@
     regexp: '^DenyUsers '
     line: DenyUsers {{ ssh_deny_users }}
   when: ssh_deny_users| default([])|length > 0
+  notify: restart systemd sshd
   tags: ssh
 
 - name: remove ssh deny users if ssh_deny_users is empty
@@ -68,6 +70,7 @@
     regexp: '^DenyUsers '
     line: DenyUsers {{ ssh_deny_users }}
   when: ssh_deny_users| default([])|length == 0
+  notify: restart systemd sshd
   tags: ssh
 
 - name: configure sshd options
@@ -80,6 +83,7 @@
     - PermitEmptyPasswords no
     - PasswordAuthentication yes
     - PermitRootLogin prohibit-password
+  notify: restart systemd sshd
   tags: ssh
 
 # ---- fail2ban ----

@@ -1,4 +1,10 @@
 ---
+- name: restart systemd sshd
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: sshd
+    state: restarted
+
 - name: Reload systemd nut-client
   ansible.builtin.systemd:
     daemon_reload: true
