@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # Ensures Pi2 have the correct "overclocking" setting
 
-from ansible.module_utils.basic import *
 import re
+from ansible.module_utils.basic import *
 
 # START - common module code - yay for copy-paste
 BOOT_CONFIG_PATH = "/boot/config.txt"
@@ -15,7 +15,7 @@ class ConfigFile:
 
     @staticmethod
     def __param_string(param, value):
-        return param+"="+value
+        return param + "=" + value
 
     def __init__(self, file_name=BOOT_CONFIG_PATH):
         self.is_changed = False
@@ -34,14 +34,14 @@ class ConfigFile:
         # search for an uncommented line, and a commented one if that fails
         line_num = self.__find_starting_with(param)
         if line_num == -1:
-            line_num = self.__find_starting_with('#'+param)
+            line_num = self.__find_starting_with('#' + param)
 
         # ...and finally just create an empty line
         if line_num == -1:
             line_num == len(self.lines)
             self.lines.append("")
 
-        target_value = self.__param_string(param, value)+"\n"
+        target_value = self.__param_string(param, value) + "\n"
         if self.lines[line_num] != target_value:
             self.lines[line_num] = target_value
             self.is_changed = True
@@ -50,6 +50,8 @@ class ConfigFile:
             return True
         else:
             return False
+
+
 # END - common module code - yay for copy-paste
 
 CPU_INFO_PATH = "/proc/cpuinfo"
@@ -58,7 +60,8 @@ CPU_PI2 = "Pi2"
 
 CPU_TYPES = "cpu_types"
 
-CONFIG_OC_REGEXP = re.compile("set_overclock " + CPU_PI2 + " (?P<arm_freq>\d+) (?P<core_freq>\d+) (?P<sdram_freq>\d+) (?P<over_voltage>\d+)")
+CONFIG_OC_REGEXP = re.compile(
+    "set_overclock " + CPU_PI2 + " (?P<arm_freq>\d+) (?P<core_freq>\d+) (?P<sdram_freq>\d+) (?P<over_voltage>\d+)")
 
 
 def read_oc_params():
@@ -87,6 +90,8 @@ def main():
             config_file.set(param, value)
         module.exit_json(changed=config_file.is_changed, msg="Is Pi2, ensured optimum CPU params.")
     else:
-        module.exit_json(changed=False, msg="CPU chipset does not appear to be a Pi2 (but you can still custom-OC it by setting 'raspi_config_other_options!).")
+        module.exit_json(changed=False,
+                         msg="CPU chipset does not appear to be a Pi2 (but you can still custom-OC it by setting 'raspi_config_other_options!).")
+
 
 main()

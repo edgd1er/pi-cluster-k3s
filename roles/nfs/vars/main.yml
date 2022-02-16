@@ -31,6 +31,17 @@ required_packages:
   - software-properties-common
   - nfs-common
   - quota
+#added packages from other roles due to role vars precedence heritage
+  - fail2ban
+  - git
+  - procps
+  - iotop
+  - dnsutils
+  - nut-client
+  - vim
+  - lsof
+  - nut-client
+  - sysstat
 
 extra_packages:
   - sqlite3

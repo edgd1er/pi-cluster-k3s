@@ -5,13 +5,13 @@ repos:
       - id: flake8
         name: flake8
         language: system
-        entry: flake8 .
+        entry: flake8 -c .flake8 .
         pass_filenames: false
         always_run: true
       - id: yamllint
         name: yamllint
         language: system
-        entry: yamllint .
+        entry: yamllint -c .yamllint .
         pass_filenames: false
         always_run: true
       - id: ansible-lint

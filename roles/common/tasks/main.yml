@@ -34,6 +34,10 @@
     update_cache: true
   #tags: always
 
+- name: display required packages
+  debug:
+    msg: "lists: {{ required_packages }}"
+
 - name: install required packages
   apt:
     state: present
@@ -41,7 +45,7 @@
     autoclean: true
     autoremove: true
     update_cache: true
-  when: required_packages| default([]) |length > 0
+  when: required_packages | default([]) |length > 0
   #tags: always
 
 # ---- ssh  ----

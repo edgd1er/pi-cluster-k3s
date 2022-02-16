@@ -38,7 +38,7 @@
 - name: package for ansible.builtin.expect
   apt:
     state: present
-    pkg: "python-pexpect"
+    pkg: "python3-pexpect"
     autoclean: true
     autoremove: true
     update_cache: true

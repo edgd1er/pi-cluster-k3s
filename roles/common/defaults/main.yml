@@ -114,6 +114,7 @@ required_packages:
   - vim
   - lsof
   - nut-client
+  - sysstat
 
 # ---- sysstat ----
 sysstat: false
