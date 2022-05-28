@@ -4,20 +4,17 @@
   remote_user: pi
   become: yes
   gather_facts: yes
-  vars: []
-  tasks:
-    # ---- raspi ----
-    - name: config raspi
-      import_role:
-        name: mikolak_net.raspi_config
-      tags: raspi
   roles:
+    - role: mikolak_net.raspi_config
+      tags: raspi
     - role: common
       tags: common
     - role: users
       tags: users
     - role: nfs
       tags: nfs
+    #- role: msmtpd
+    #  tags: msmtpd
 
 # ssh config
 # fail2ban

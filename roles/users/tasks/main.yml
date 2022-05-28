@@ -63,5 +63,5 @@
   loop_control:
     label: "{{ item.0.name }} - creating authorized ssh_pub_key"
 
-- name: stop playbook
-  meta: end_play
+#- name: stop playbook
+#  meta: end_play

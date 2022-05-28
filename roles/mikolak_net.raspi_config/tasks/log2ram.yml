@@ -11,7 +11,6 @@
   ansible.builtin.git:
     repo: 'https://github.com/azlux/log2ram.git'
     dest: /tmp/log2ram
-    single_branch: yes
     version: master
 
 - name: Install log2ram

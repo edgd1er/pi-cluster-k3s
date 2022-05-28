@@ -26,10 +26,9 @@
     ( ansible_facts.services["zram-swap.service"].state == "running")
 
 - name: Clone zram-swap project
-  ansible.builtin.git:
-    repo: 'https://github.com/foundObjects/zram-swap'
+  git:
+    repo: 'https://github.com/foundObjects/zram-swap.git'
     dest: /tmp/zram-swap
-    single_branch: yes
     version: master
 
 - name: Run the install script

@@ -20,6 +20,13 @@
   register: pi_netnames
   changed_when: False
 
+# ---- dns  ----
+- name: add domain search
+  lineinfile:
+    path: /etc/resolv.conf
+    line: "search mission.lan"
+  tags: dns
+
 - name: Print all available facts
   ansible.builtin.debug:
     var: ansible_facts
@@ -210,12 +217,13 @@
     - "Reload systemd nut-monitor"
   tags: nut
 
-# - name: reboot
-#  become: yes
-#  ansible.builtin.reboot:
-#    reboot_timeout: "{{ raspi_config_reboot_max_wait_time }}"
+- name: reboot
+  become: yes
+  ansible.builtin.reboot:
+    reboot_timeout: "{{ raspi_config_reboot_max_wait_time }}"
+  when: common_reboot|bool == True
 
-# - name: wait for reboot
-#  wait_for_connection:
-#    delay: "{{ raspi_config_reboot_min_time }}"
-#    timeout: "{{ raspi_config_reboot_max_wait_time }}"
+- name: wait for reboot
+  wait_for_connection:
+    delay: "{{ raspi_config_reboot_min_time }}"
+    timeout: "{{ raspi_config_reboot_max_wait_time }}"

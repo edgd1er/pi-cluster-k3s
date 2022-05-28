@@ -19,7 +19,6 @@ all:
         netpi02: { }
       vars:
         log2ram: true
-
     k3s_coordinator:
       hosts:
         netpi01: { }
@@ -32,3 +31,7 @@ all:
   vars:
     ansible_python_interpreter: /usr/bin/python3
     remote_user: pi
+    ansible_connection: ssh
+    ansible_user: pi
+    ansible_ssh_pass: pi
+    common_reboot: false

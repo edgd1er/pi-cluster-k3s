@@ -36,6 +36,9 @@ ping:
 common:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t common base_config.yml
 
+msmtpd:
+		ansible-playbook -l cluster -i inventory.yml -u pi -t msmtpd.yml
+
 raspi:
 		ansible-playbook -l cluster -i inventory.yml -u pi -t raspi base_config.yml
 

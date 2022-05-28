@@ -3,7 +3,7 @@
   ansible.builtin.systemd:
     daemon_reload: true
     name: sshd
-    state: restarted
+    state: reloaded
 
 - name: Reload systemd nut-client
   ansible.builtin.systemd:
@@ -35,7 +35,7 @@
   ansible.builtin.systemd:
     daemon_reload: true
     name: fail2ban
-    state: started
+    state: reloaded
 
 - name: Stop systemd fail2ban
   ansible.builtin.systemd:
