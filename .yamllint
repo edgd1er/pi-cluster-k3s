@@ -68,4 +68,5 @@ rules:
 
   trailing-spaces: disable
 
-  truthy: disable
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']

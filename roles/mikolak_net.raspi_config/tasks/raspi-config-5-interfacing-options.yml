@@ -6,7 +6,7 @@
 - name: Get camera status
   command: "raspi-config nonint get_camera"
   register: camera_status
-  changed_when: False
+  changed_when: false
 
 - name: Print camera status
   debug:
@@ -24,7 +24,7 @@
 - name: Check if SSH is enabled or not
   command: "raspi-config nonint get_ssh"
   register: ssh_status
-  changed_when: False
+  changed_when: false
 
 - name: Print SSH status
   debug:
@@ -42,7 +42,7 @@
 - name: Get VNC status
   command: "raspi-config nonint get_vnc"
   register: vnc_status
-  changed_when: False
+  changed_when: false
 
 - name: Print VNC status
   debug:
@@ -60,7 +60,7 @@
 - name: Get SPI status
   command: "raspi-config nonint get_spi"
   register: spi_status
-  changed_when: False
+  changed_when: false
 
 - name: Print SPI status
   debug:
@@ -78,7 +78,7 @@
 - name: Get I2C status
   command: "raspi-config nonint get_i2c"
   register: i2c_status
-  changed_when: False
+  changed_when: false
 
 - name: Print I2C status
   debug:
@@ -96,12 +96,12 @@
 - name: Get serial status
   command: "raspi-config nonint get_serial"
   register: serial_status
-  changed_when: False
+  changed_when: false
 
 - name: Get serialHW status
   command: "raspi-config nonint get_serial_hw"
   register: serialhw_status
-  changed_when: False
+  changed_when: false
 
 - name: Print serial status
   debug:
@@ -123,7 +123,7 @@
 - name: Get Onewire status
   command: "raspi-config nonint get_onewire"
   register: onewire_status
-  changed_when: False
+  changed_when: false
 
 - name: Print Onewire status
   debug:
@@ -141,7 +141,7 @@
 - name: Get rGPIO status
   command: "raspi-config nonint get_rgpio"
   register: rgpio_status
-  changed_when: False
+  changed_when: false
 
 - name: Print rGPIO status
   debug:

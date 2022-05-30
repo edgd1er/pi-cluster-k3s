@@ -6,7 +6,7 @@
 - name: Get hostname
   command: "raspi-config nonint get_hostname"
   register: pi_hostname
-  changed_when: False
+  changed_when: false
 
 - name: Print current hostname
   debug:
@@ -24,7 +24,7 @@
 - name: Get network names status
   command: "raspi-config nonint get_net_names"
   register: pi_netnames
-  changed_when: False
+  changed_when: false
 
 - name: Print current network names status
   debug:

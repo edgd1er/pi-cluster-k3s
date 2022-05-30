@@ -6,7 +6,7 @@
 - name: Check if FS is expandable
   command: "raspi-config nonint get_can_expand"
   register: fs_filled
-  changed_when: False
+  changed_when: false
 
 - name: Print if FS is expandable or not
   debug:
@@ -21,7 +21,7 @@
 - name: Get Overscan status
   command: "raspi-config nonint get_overscan"
   register: pi_overscan
-  changed_when: False
+  changed_when: false
 
 - name: Print Overscan
   debug:
@@ -35,22 +35,22 @@
 - name: Get current GPU memory split (1/4)
   command: "raspi-config nonint get_config_var gpu_mem /boot/config.txt"
   register: gpu_mem
-  changed_when: False
+  changed_when: false
 
 - name: Get current GPU memory split 256 (2/4)
   command: "raspi-config nonint get_config_var gpu_mem_256 /boot/config.txt"
   register: gpu_mem_256
-  changed_when: False
+  changed_when: false
 
 - name: Get current GPU memory split 512 (3/4)
   command: "raspi-config nonint get_config_var gpu_mem_512 /boot/config.txt"
   register: gpu_mem_512
-  changed_when: False
+  changed_when: false
 
 - name: Get current GPU memory split 1024 (4/4)
   command: "raspi-config nonint get_config_var gpu_mem_1024 /boot/config.txt"
   register: gpu_mem_1k
-  changed_when: False
+  changed_when: false
 
 - name: Print current GPU memory split
   debug:
@@ -73,12 +73,12 @@
 - name: Get HDMI group
   command: "raspi-config nonint get_config_var hdmi_group /boot/config.txt"
   register: hdmi_group
-  changed_when: False
+  changed_when: false
 
 - name: Get HDMI mode
   command: "raspi-config nonint get_config_var hdmi_mode /boot/config.txt"
   register: hdmi_mode
-  changed_when: False
+  changed_when: false
 
 - name: Print HDMI group & mode
   debug:
@@ -92,7 +92,7 @@
 - name: Get pixel doubling
   command: "raspi-config nonint get_pixdub"
   register: pixdub_status
-  changed_when: False
+  changed_when: false
 
 - name: Print pixel doubling status
   debug:
@@ -109,7 +109,7 @@
 - name: Get swapfile status
   command: "swapon --noheadings --show=Size"
   register: swapon_size
-  changed_when: False
+  changed_when: false
 
 - name: Print swapfile status
   debug:

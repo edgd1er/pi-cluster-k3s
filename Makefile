@@ -27,6 +27,9 @@ poweroff:
 		#ansible cluster -i inventory.yml -m shell -a 'sudo poweroff' -u pi
 		ansible-playbook -i inventory.yml -u pi play_shutdown.yml
 
+update:
+		ansible cluster -i inventory.yml -m shell -a 'sudo apt-get update && sudo apt-get upgrade -y' -u pi
+
 reboot:
 		ansible cluster -i inventory.yml -m shell -a 'sudo reboot' -u pi
 

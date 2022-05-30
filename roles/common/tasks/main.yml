@@ -7,7 +7,7 @@
 - name: Get Raspberry Pi type
   command: "raspi-config nonint get_pi_type"
   register: pi_type
-  changed_when: False
+  changed_when: false
 
 - name: Show pi version
   debug:
@@ -18,7 +18,7 @@
 - name: Get network names status
   command: "raspi-config nonint get_net_names"
   register: pi_netnames
-  changed_when: False
+  changed_when: false
 
 # ---- dns  ----
 - name: add domain search
@@ -221,7 +221,7 @@
   become: yes
   ansible.builtin.reboot:
     reboot_timeout: "{{ raspi_config_reboot_max_wait_time }}"
-  when: common_reboot|bool == True
+  when: common_reboot|bool == true
 
 - name: wait for reboot
   wait_for_connection:

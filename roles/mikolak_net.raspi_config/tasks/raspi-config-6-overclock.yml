@@ -6,7 +6,7 @@
 - name: Get overclock
   command: "raspi-config nonint get_config_var arm_freq /boot/config.txt"
   register: pi_overclock
-  changed_when: False
+  changed_when: false
 
 - name: Print overclock
   debug:

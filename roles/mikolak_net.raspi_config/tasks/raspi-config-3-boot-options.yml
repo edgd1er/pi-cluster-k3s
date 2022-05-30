@@ -6,7 +6,7 @@
 - name: Get boot CLI
   command: "raspi-config nonint get_boot_cli"
   register: boot_cli
-  changed_when: False
+  changed_when: false
 
 - name: Print boot CLI
   debug:
@@ -15,7 +15,7 @@
 - name: Get boot autologin
   command: "raspi-config nonint get_autologin"
   register: auto_login
-  changed_when: False
+  changed_when: false
 
 - name: Print boot autologin status
   debug:
@@ -31,7 +31,7 @@
 - name: Get boot wait for network status
   command: "raspi-config nonint get_boot_wait"
   register: boot_wait
-  changed_when: False
+  changed_when: false
 
 - name: Print boot wait for network status
   debug:
@@ -47,7 +47,7 @@
 - name: Get splash status
   command: "raspi-config nonint get_boot_splash"
   register: boot_splash
-  changed_when: False
+  changed_when: false
 
 - name: Print boot splash status
   debug:

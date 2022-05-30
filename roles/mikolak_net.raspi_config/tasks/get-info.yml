@@ -5,7 +5,7 @@
   # ansible.builtin.command: raspi-config nonint get_pi_type
   command: raspi-config nonint get_pi_type
   register: pi_type
-  changed_when: False
+  changed_when: false
 
 - name: Show pi version
   debug:
