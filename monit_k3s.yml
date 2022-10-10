@@ -17,5 +17,9 @@
       tags: node_exporter
       when: inventory_hostname in groups['cluster']
     - role: k3s
-      tags: k3s
+      tags:
+      - k3s
+      - k3s-nodes
+      - k3s-master
+      - k3s-tools
       when: inventory_hostname in groups['cluster']

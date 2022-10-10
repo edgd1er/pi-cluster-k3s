@@ -1,0 +1,42 @@
+---
+- name: get local version
+  shell: kubectl version -o json | jq -r .clientVersion.gitVersion
+  register: k3s_local_node_version
+
+- name: Install k3s
+  shell: curl -sfL https://get.k3s.io | sh -
+  args:
+    warn: false
+  environment:
+    INSTALL_K3S_VERSION: '{{ latest.stdout }}'
+    K3S_URL: "https://{{ hostvars[ groups['k3s_coordinator'] | first ]['ansible_facts']['default_ipv4']['address'] }}:6443"
+    K3S_TOKEN: "{{ hostvars[ groups['k3s_coordinator'] | first ].k3s_node_token_encoded.content | b64decode | trim }}"
+  register: k3s_agent_install
+  when: k3s_local_node_version.stdout != latest.stdout
+
+- debug: msg="{{ k3s_agent_install.stdout_lines }}"
+  when: k3s_local_node_version.stdout != latest.stdout
+- debug: msg="{{ k3s_agent_install.stderr_lines }}"
+  when: k3s_local_node_version.stdout != latest.stdout
+
+- name: check service present
+  stat:
+    path: "/etc/systemd/system/k3s-agent.service"
+  register: k3s_agent
+
+- name: Copy K3s service file
+  register: k3s_service
+  template:
+    src: "k3s-node.service.j2"
+    dest: "{{ systemd_dir }}/k3s-agent.service"
+    owner: root
+    group: root
+    mode: 0644
+  when: not k3s_agent.stat.exists or not k3s_agent.stat.isreg
+
+- name: Enable and check K3s service
+  systemd:
+    name: k3s-agent
+    daemon_reload: yes
+    state: restarted
+    enabled: yes

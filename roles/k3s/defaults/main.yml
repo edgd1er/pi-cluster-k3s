@@ -1,0 +1,16 @@
+---
+# defaults file for k3s
+k3s_server_location: /var/lib/rancher/k3s
+systemd_dir: /etc/systemd/system
+k3s_master:
+  hostname: none
+  ip: none
+  #flags:
+    #- --no-deploy servicelb
+    #- --no-deploy traefik
+    #- --no-deploy kubernetes-dashboard
+
+#k3s_version: "v1.21.2+k3s1"
+master_ip: "{{ hostvars[groups['k3s_coordinator'][0]]['ansible_host'] | default(groups['k3s_coordinator'][0]) }}"
+extra_server_args: ""
+extra_agent_args: ""

@@ -1,0 +1,50 @@
+---
+- name: add helm repo and helm packages
+  shell: |
+    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+    apt-get install apt-transport-https --yes
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+    apt-get update
+    apt-get install helm
+  when: false
+
+- name: add helm via script
+  shell: |
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+- name: copy traefik default values
+  copy:
+    src: traefik.values.yml
+    dest: /root/helm/traefik.values.yml
+    owner: "{{ user_id }}"
+    group: "{{ group_id }}"
+    mode: 0755
+
+- name: ingress controller via helm
+  shell: |
+    kubectl create namespace traefik
+    helm repo add traefik https://helm.traefik.io/traefik
+    helm repo update
+    helm install traefik traefik/traefik --namespace=traefik --values=traefik.values.yaml
+  register: helm_traefik
+
+- name: install dashboard
+  shell: |
+    GITHUB_URL=https://github.com/kubernetes/dashboard/releases
+    VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
+    k3s kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSION_KUBE_DASHBOARD}/aio/deploy/recommended.yaml
+  register: dashboard
+
+- name: copy dashboard config files.
+  copy:
+    src: "{{ item }}"
+    dest: "/root/{{ item }}"
+    mode: "u=rw,g=,o="
+  loop:
+    - dashboard.admin-user.yaml
+    - dashboard.user-role.yaml
+
+- name: create dashboard
+  shell: |
+    cd /root
+    sudo k3s kubectl create -f dashboard.admin-user.yml -f dashboard.admin-user-role.yml

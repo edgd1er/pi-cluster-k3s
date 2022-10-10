@@ -1,0 +1,78 @@
+---
+# tasks file for k3s
+- name: Enable IPv4 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: yes
+
+- name: Enable IPv6 forwarding
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: "1"
+    state: present
+    reload: yes
+  when: ansible_all_ipv6_addresses
+
+# fsck.mode=force cgroup_enable=memory cgroup_memory=1 cgroup_enable=cpuset
+- name: Activating cgroup support
+  lineinfile:
+    path: /boot/cmdline.txt
+    regexp: '^((?!.*\bcgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory\b).*)$'
+    line: '\1 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory'
+    backrefs: true
+  notify: reboot
+
+- name: Flush iptables before changing to iptables-legacy
+  iptables:
+    flush: true
+  changed_when: false   # iptables flush always returns changed
+  when: false
+
+- name: Changing to iptables-legacy
+  alternatives:
+    path: /usr/sbin/iptables-legacy
+    name: iptables
+  register: ip4_legacy
+
+- name: Changing to ip6tables-legacy
+  alternatives:
+    path: /usr/sbin/ip6tables-legacy
+    name: ip6tables
+  register: ip6_legacy
+
+- name: get latest version
+  #shell: 'set -o pipefail; curl --silent \"https://api.github.com/repos/k3s-io/k3s/releases/latest\" | grep -Pom1 \"(?=v)([^\"]*)\"'
+  shell: 'curl --silent "https://api.github.com/repos/k3s-io/k3s/releases/latest" | jq -r .tag_name'
+  args:
+    executable: "/usr/bin/bash"
+  register: latest
+  failed_when: false
+  changed_when: false
+
+- name: print k3s latest
+  debug:
+    msg: k3s latest {{ latest.stdout }}
+
+- include_tasks: init_master.yml
+  when: inventory_hostname in groups['k3s_coordinator']
+  tags:
+    - k3s
+    - k3s-master
+
+- include_tasks: init_nodes.yml
+  when: inventory_hostname in groups['k3s_worker']
+  tags:
+    - k3s
+    - k3-nodes
+
+- include_tasks: k3s_tools.yml
+  when: inventory_hostname in groups['k3s_coordinator']
+  tags: k3s-tools
+
+- name: stop playbook
+  meta: end_play
+  when: false
+
+#  when: inventory_hostname in groups['k3s_worker']

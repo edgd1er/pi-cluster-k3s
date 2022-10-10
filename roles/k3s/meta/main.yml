@@ -1,0 +1,16 @@
+---
+galaxy_info:
+  author: edgd1er
+  description: install k3s
+  company: None
+
+  license: BSD
+  # developped with v2.9 might be ok with lower version
+  min_ansible_version: 2.9
+  platforms:
+    - name: Raspbian
+  galaxy_tags:
+    - development
+    - system
+
+dependencies: []
