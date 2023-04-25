@@ -12,6 +12,11 @@ all:
       zram_mem_factor: 25
       _zram: true
       _zram_fixedsize: 500M
+    netpi03:
+      ansible_host: netpi03
+      zram_mem_factor: 25
+      _zram: true
+      _zram_fixedsize: 500M
   children:
     cluster:
       hosts:

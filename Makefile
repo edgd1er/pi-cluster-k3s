@@ -28,58 +28,58 @@ poweroff:
 		ansible-playbook -i inventory.yml -u pi play_shutdown.yml
 
 update:
-		ansible cluster -i inventory.yml -m shell -a 'sudo apt-get update && sudo apt-get upgrade -y' -u pi
+		ansible cluster -i inventory.yml --become-user root -b -u pi -m shell -a ' apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y'
 
 reboot:
-		ansible cluster -i inventory.yml -m shell -a 'sudo reboot' -u pi
+		ansible cluster -i inventory.yml --become-user root -b -u pi -m shell -a 'sudo reboot'
 
 ping:
-		ansible cluster -i inventory.yml -m ping -u pi
+		ansible cluster -i inventory.yml --become-user root -b -u pi -m ping
 
 common:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t common base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t common base_config.yml
 
 msmtpd:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t msmtpd.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t msmtpd.yml
 
 raspi:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t raspi base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t raspi base_config.yml
 
 sysstat:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t sysstat base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t sysstat base_config.yml
 
 nut:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t nut base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t nut base_config.yml
 
 zram:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t zram base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t zram base_config.yml
 
 log2ram:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t log2ram base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t log2ram base_config.yml
 
 users:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t users base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t users base_config.yml
 
 nfs:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t nfs base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t nfs base_config.yml
 
 nfsserver:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsserver base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t nfsserver base_config.yml
 
 nfsclient:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t nfsclient base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t nfsclient base_config.yml
 
 ssh:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t ssh base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t ssh base_config.yml
 
 fail2ban:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t fail2ban base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t fail2ban base_config.yml
 
 firewall:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t firewall base_config.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t firewall base_config.yml
 
 monitoring:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t monitoring monit_k3s.yml
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t monitoring monit_k3s.yml
 
 k3s:
-		ansible-playbook -l cluster -i inventory.yml -u pi -t k3s monit_k3s.yml -vv
+		ansible-playbook -l cluster -i inventory.yml --become-user root -b -u pi -t k3s monit_k3s.yml -vv
