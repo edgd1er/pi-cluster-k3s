@@ -21,7 +21,7 @@ all:
     cluster:
       hosts:
         netpi01: { }
-        netpi02: { }
+        netpi03: { }
       vars:
         log2ram: true
     k3s_coordinator:

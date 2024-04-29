@@ -115,6 +115,7 @@ required_packages:
   - lsof
   - nut-client
   - sysstat
+  - screen
 
 # ---- sysstat ----
 sysstat: false

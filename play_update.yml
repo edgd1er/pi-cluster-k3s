@@ -1,0 +1,22 @@
+---
+- hosts: cluster
+  gather_facts: no
+  become: yes
+  become_user: root
+  tasks:
+    - name: export key
+      shell: |
+        sed -i "s#deb http#deb [signed-by=/etc/apt/trusted.gpg.d/all_trusted.gpg.asc] http#" /etc/apt/source.list
+        [[ ! -f /etc/apt/trusted.gpg.d/all_trusted.gpg.asc ]] && apt-key exportall >/etc/apt/trusted.gpg.d/all_trusted.gpg.asc || true
+      register: export
+    - name: apt
+      ansible.builtin.apt:
+        upgrade: "dist"
+        update_cache: yes
+        autoremove: yes
+        purge: true
+      register: apt_out
+
+
+    - name: wait go down
+      local_action: wait_for host={{ ansible_ssh_host }} port=22 state=stopped
